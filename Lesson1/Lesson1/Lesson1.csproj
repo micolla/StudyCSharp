@@ -7,7 +7,7 @@
     <ProjectGuid>{C86F9FEF-5004-4A6F-BCC5-ACAE4D1BA837}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Lesson1</RootNamespace>
-    <AssemblyName>Lesson1</AssemblyName>
+    <AssemblyName>FirstSecondTask</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

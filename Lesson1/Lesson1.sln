@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distance", "Distance\Distan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChangeValues", "ChangeValues\ChangeValues.csproj", "{56DF5907-8A89-4397-8357-6066E92C1E66}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayUsersData", "DisplayUsersData\DisplayUsersData.csproj", "{C5FD99E4-A0DD-4A52-A90C-4658F2B1C1DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{56DF5907-8A89-4397-8357-6066E92C1E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56DF5907-8A89-4397-8357-6066E92C1E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56DF5907-8A89-4397-8357-6066E92C1E66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5FD99E4-A0DD-4A52-A90C-4658F2B1C1DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5FD99E4-A0DD-4A52-A90C-4658F2B1C1DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5FD99E4-A0DD-4A52-A90C-4658F2B1C1DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5FD99E4-A0DD-4A52-A90C-4658F2B1C1DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

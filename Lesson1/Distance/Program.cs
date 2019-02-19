@@ -8,15 +8,20 @@ namespace Distance
 {
     class Program
     {
+        #region Вспомогательный метод
         static string requestToUser(string msg)
         {
             Console.WriteLine(msg);
             return Console.ReadLine();
         }
+        #endregion
+        #region Задание 3 с помощью метода
+        // Метод для расчета расстояний
         static double getDitancePoint(float x1,float y1,float x2,float y2)
         {
             return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
+
         static void Main(string[] args)
         {
             float x1, x2, y1, y2;
@@ -51,5 +56,6 @@ namespace Distance
             Console.WriteLine("Расстояние между точками {0:F2}", r);
             Console.ReadLine();
         }
+        #endregion
     }
 }

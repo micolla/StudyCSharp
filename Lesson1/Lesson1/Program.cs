@@ -8,17 +8,23 @@ namespace Lesson1
 {
     class Program
     {
+        #region Функция для запроса у пользователя
         static string requestToUser(string msg)
         {
             Console.WriteLine(msg);
             return Console.ReadLine();
         }
+        #endregion
+        #region Второе задание
         static float getIMT(float height, float weight) {
             return weight / (height*height/10000);
         }
+        #endregion
+
         static void Main(string[] args)
         {
-            bool success=false;
+            #region  Первое задание
+            bool success =false;
             string firstName, lastName,agePostfix;
             int age;
             float weight,height=0;
@@ -51,12 +57,13 @@ namespace Lesson1
             }
             else{ agePostfix = "лет"; }
             Console.WriteLine();
-            Console.WriteLine("Вас зовут {0} \n" +
-                        "Вам {1} {3} \n" +
-                        "Вы весите {2:F2} кг\n" +
-                        "При росте {4:f2}", firstName + " " + lastName, age, weight
-                            , agePostfix,height);
+            Console.WriteLine("Вас зовут "+ firstName+" "+lastName);
+            Console.WriteLine("Вам {0} {1} ", age, agePostfix);
+            Console.WriteLine($"Вы весите {weight:F2} кг\nПри росте {height:F2}");
+            #endregion
+            #region Второе задание
             Console.WriteLine("Ваш ИМТ равен {0:F2}", getIMT(height, weight));
+            #endregion
             Console.ReadLine();
         }
     }
