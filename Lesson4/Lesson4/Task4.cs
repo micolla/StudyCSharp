@@ -77,16 +77,23 @@ namespace Lesson4
             }
             return cnt;
         }
-        ///// <summary>
-        ///// Возвращает распределение элементов массива
-        ///// </summary>
-        ///// <returns>массив</returns>
-        //public int[] GetNumberValues()
-        //{
-        //    int[] b;
-        //    b=a.Distinct().Count();
-        //    return new int[] { 1 };
-        //} 
+        /// <summary>
+        /// Возвращает распределение элементов массива
+        /// </summary>
+        /// <returns>массив</returns>
+        public int[,] GetNumberValues()
+        {
+            int[,] b=new int[a.Max()+1,2];
+            for (int i = 0; i < b.GetLength(0); i++)
+            {
+                b[i, 0] = i;
+            }
+            for (int i = 0; i < a.Length; i++)
+            {
+                b[a[i], 1]++;
+            }
+            return b;
+        }
 
         public int Max
         {

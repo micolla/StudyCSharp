@@ -50,6 +50,15 @@ namespace Lesson4
             Console.WriteLine(t4.Sum);
             Console.WriteLine(t4.Inverse());
             Console.WriteLine(t4.MaxCount);
+            t4 = new MyArray(100,50,85);
+            Console.WriteLine(t4.ToString());
+            int[,] display = t4.GetNumberValues();
+            Console.WriteLine("Частота распределения");
+            for (int i = 0; i < display.GetLength(0); i++)
+            {
+                if (display[i, 1] > 0)
+                    Console.WriteLine($"Array[{display[i, 0]},{display[i, 1]}]");
+            }
         }
         #endregion
         #region Task5
