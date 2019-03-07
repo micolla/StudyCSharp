@@ -45,6 +45,8 @@ namespace Lesson5
         }
         static void Task4()
         {
+            EGE e1 = new EGE(@"pupils.txt");
+            e1.PrintArray(e1.GetWorsPupils());
         }
 
         //Донцов Николай
@@ -53,7 +55,7 @@ namespace Lesson5
             Task1();
             Task2();
             Task33();
-            //Task4();
+            Task4();
             Console.ReadLine();
         }
 
