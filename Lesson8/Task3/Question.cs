@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml.Serialization;
 namespace BelieveOrNotBelieve
 {
+
     // Класс для вопроса    
     [Serializable]
     public class Question
@@ -24,47 +25,86 @@ namespace BelieveOrNotBelieve
     
     class TrueFalse
     {
-        string fileName;
-        List<Question> list;
+        public delegate void MethodContainer();
+        /// <summary>
+        /// Событие при добавлении первого элемента в список вопросов
+        /// </summary>
+        public event MethodContainer onFirstAddQuestion;
+        /// <summary>
+        /// Событие при удалении всех элементов списка вопросов
+        /// </summary>
+        public event MethodContainer onEmptyQuestion; 
+        string _fileName;
+        List<Question> _list;
         public string FileName
         {
-            set { fileName = value; }
+            set { _fileName = value; }
         }
         public TrueFalse(string fileName)
         {
-            this.fileName = fileName;
-            list = new List<Question>();
+            this._fileName = fileName;
+            _list = new List<Question>();
         }
         public void Add(string text, bool trueFalse)
         {
-            list.Add(new Question(text, trueFalse));
+            _list.Add(new Question(text, trueFalse));
+            if (_list.Count == 1)
+            {
+                onFirstAddQuestion();
+            }
         }
+        /// <summary>
+        /// При удалении последнего элемента вызывает событие onEmptyQuestion
+        /// </summary>
+        /// <param name="index"></param>
         public void Remove(int index)
         {
-            if (list != null && index < list.Count && index >= 0) list.RemoveAt(index);
+            if (_list != null && index <= _list.Count && index >= 0) _list.RemoveAt(index);
+            if (_list.Count == 0)
+                onEmptyQuestion();//Событие обнуления списка
         }
         // Индексатор - свойство для доступа к закрытому объекту
         public Question this[int index]
         {
-            get { return list[index]; }
+            get { return _list[index]; }
         }
         public void Save()
         {
             XmlSerializer xmlFormat = new XmlSerializer(typeof(List<Question>));
-            Stream fStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
-            xmlFormat.Serialize(fStream, list);
+            Stream fStream = new FileStream(_fileName, FileMode.Create, FileAccess.Write);
+            xmlFormat.Serialize(fStream, _list);
             fStream.Close();
         }
+        public void Save(string filePath)
+        {
+            XmlSerializer xmlFormat = new XmlSerializer(typeof(List<Question>));
+            Stream fStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            xmlFormat.Serialize(fStream, _list);
+            fStream.Close();
+            this._fileName = filePath;
+        }
+
         public void Load()
         {
             XmlSerializer xmlFormat = new XmlSerializer(typeof(List<Question>));
-            Stream fStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            list = (List<Question>)xmlFormat.Deserialize(fStream);
-            fStream.Close();
+            Stream fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
+            try
+            {
+                _list = (List<Question>)xmlFormat.Deserialize(fStream);
+                onFirstAddQuestion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                fStream.Close();
+            }            
         }
         public int Count
         {
-            get { return list.Count; }
+            get { return _list.Count; }
         }
     }
 }

@@ -11,6 +11,12 @@ using BelieveOrNotBelieve;
 
 namespace Task3
 {
+    //Донцов Николай
+    //а) Создать приложение, показанное на уроке, добавив в него защиту от возможных ошибок (не создана база данных, обращение к несуществующему вопросу, открытие слишком большого файла и т.д.).
+    //б) Изменить интерфейс программы, увеличив шрифт, поменяв цвет элементов и добавив другие «косметические» улучшения на свое усмотрение.
+    //в) Добавить в приложение меню «О программе» с информацией о программе(автор, версия, авторские права и др.).
+    //г)* Добавить пункт меню Save As, в котором можно выбрать имя для сохранения базы данных(элемент SaveFileDialog).
+
     public partial class Form1 : Form
     {
         TrueFalse database;
@@ -29,20 +35,36 @@ namespace Task3
             SaveFileDialog sfd = new SaveFileDialog();
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                database = new TrueFalse(sfd.FileName);
-                //database.Add("123", true);
-                //database.Save();
-                //nudNumber.Minimum = 1;
-                //nudNumber.Maximum = 1;
-                //nudNumber.Value = 1;
-                panel1.Enabled = true;
+                DatabaseSettings(sfd.FileName);
+                btnAdd.Enabled = true;
             };
+        }
+        //Активация пунктов меню
+        void TurnOnBtns()
+        {
+            for (int i = 0; i < panel1.Controls.Count; i++)
+            {
+                panel1.Controls[i].Enabled = true;
+            }
+            tboxQuestion.Enabled = true;
+        }
+        void TurnOffBtns()
+        {
+            for (int i = 0; i < panel1.Controls.Count; i++)
+            {
+                panel1.Controls[i].Enabled = false;
+            }
+            tboxQuestion.Enabled = false;
+            btnAdd.Enabled = true;
         }
         // Обработчик события изменения значения numericUpDown
         private void nudNumber_ValueChanged(object sender, EventArgs e)
         {
-            tboxQuestion.Text = database[(int)nudNumber.Value - 1].text;
-            cboxTrue.Checked = database[(int)nudNumber.Value - 1].trueFalse;
+            if((int)nudNumber.Value - 1 >= 0)
+            {
+                tboxQuestion.Text = database[(int)nudNumber.Value - 1].text;
+                cboxTrue.Checked = database[(int)nudNumber.Value - 1].trueFalse;
+            }
         }
         // Обработчик кнопки Добавить
         private void btnAdd_Click(object sender, EventArgs e)
@@ -52,15 +74,15 @@ namespace Task3
                 MessageBox.Show("Создайте новую базу данных", "Сообщение");
                 return;
             }
-            database.Add((database.Count + 1).ToString(), true);
+            database.Add((database.Count).ToString(), cboxTrue.Checked);
             nudNumber.Maximum = database.Count;
             nudNumber.Value = database.Count;
         }
         // Обработчик кнопки Удалить
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (nudNumber.Maximum == 1 || database == null) return;
-            database.Remove((int)nudNumber.Value);
+            if (database == null) return;
+            database.Remove((int)nudNumber.Value-1);
             nudNumber.Maximum--;
             if (nudNumber.Value > 1) nudNumber.Value = nudNumber.Value;
         }
@@ -76,24 +98,46 @@ namespace Task3
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                database = new TrueFalse(ofd.FileName);
+                DatabaseSettings(ofd.FileName);
                 database.Load();
-                nudNumber.Minimum = 1;
-                nudNumber.Maximum = database.Count;
                 nudNumber.Value = 1;
+                nudNumber.Maximum = database.Count;
             }
         }
+
+        private void DatabaseSettings(string filePath)
+        {
+            database = new TrueFalse(filePath);
+            database.onEmptyQuestion += TurnOffBtns;
+            database.onFirstAddQuestion += TurnOnBtns;
+        }
+
         // Обработчик кнопки Сохранить (вопрос)
         private void btnSaveQuest_Click(object sender, EventArgs e)
         {
-            database[(int)nudNumber.Value - 1].text = tboxQuestion.Text;
-            database[(int)nudNumber.Value - 1].trueFalse = cboxTrue.Checked;
+            if (database.Count==0|| database.Count < (int)nudNumber.Value)
+            {
+                MessageBox.Show("Сначала нужно нажать Добавить");
+                return;
+            }
+            database[(int)nudNumber.Value-1].text = tboxQuestion.Text;
+            database[(int)nudNumber.Value-1].trueFalse = cboxTrue.Checked;
         }
 
         private void miAbout_Click(object sender, EventArgs e)
         {
             fAbout fA = new fAbout();
             fA.ShowDialog();
+        }
+
+        private void miSaveAs_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                if (database != null) database.Save(sfd.FileName);
+                else MessageBox.Show("База данных не создана");
+            }
         }
     }
 //private void 
