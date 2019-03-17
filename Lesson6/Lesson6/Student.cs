@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lesson6.StudentSpace
 {
-    class Student : IComparable
+    public class Student : IComparable
     {
         public string firstName;
         public string lastName;

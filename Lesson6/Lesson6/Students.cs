@@ -3,15 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace Lesson6.StudentSpace
 {
-    class Students
+    public class Students
     {
         List<Student> studentList;
         public Students(List<Student> ls)
         {
             studentList = ls;
+        }
+
+        public Students(string fileName)
+        {
+            studentList = new List<Student>();
+            // Запомним время в начале обработки данных
+            DateTime dt = DateTime.Now;
+            StreamReader sr = new StreamReader(fileName, Encoding.UTF8);
+            while (!sr.EndOfStream)
+            {
+                try
+                {
+                    this.AddStudent(sr.ReadLine().Split(';'));
+                }
+                catch
+                {
+                }
+            }
+            sr.Close();
         }
 
         public Students()
@@ -148,6 +169,21 @@ namespace Lesson6.StudentSpace
                     cnt++;
             }
             return cnt;
+        }
+        public void CreateXML(string fileName)
+        {
+            XmlSerializer x = new XmlSerializer(this.studentList.GetType());
+            Stream fStream;
+            if (!File.Exists(fileName))
+            {
+                fStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+            }
+            else
+            {
+                fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write);
+            }
+                x.Serialize(fStream, this.studentList);
+            fStream.Close();
         }
     }
 }
