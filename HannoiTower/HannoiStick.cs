@@ -8,34 +8,36 @@ namespace HanoiTower
     {
         //Stack<int> blocks;
         List<int> blocks;
-        public int Count { get { return blocks.Count; } }
+        int last_index;
+        public int Count { get { return last_index+1; } }
         public HannoiStick(int blockCnt)
         {
             blocks = new List<int>(blockCnt);//new Stack<int>(blockCnt);
+            last_index = blockCnt-1;
             for (int i = 0; i < blockCnt; i++)
             {
-                blocks.Add(i + 1);// Push(i+1);
+                blocks.Add(blockCnt-i);// Push(i+1);
             }
             
         }
 
         public void Push(int x)
         {
-            blocks.Push(x);
+            blocks.Add(x);
+            last_index++;
         }
 
         public int Pop()
         {
-            return blocks.Pop();
+            int ret=blocks[last_index];
+            blocks.RemoveAt(last_index);
+            last_index--;
+            return ret;
         }
 
-        public int Show()
+        public int this[int index]
         {
-            int tmp;
-            tmp = blocks.Pop();
-            //Console.WriteLine("{0}|", tmp);
-            //blocks.Pop(tmp);
-            return tmp;
+            get { return this.blocks[index]; }
         }
     }
 }

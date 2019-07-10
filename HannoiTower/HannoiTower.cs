@@ -41,9 +41,9 @@ namespace HanoiTower
 
         private void MoveTo(int from,int to)
         {
-            state[to].Push(state[from].Pop());
-            //ShowCurrentState();
             operations++;
+            state[to].Push(state[from].Pop());
+            ShowCurrentState();
         }
 
         public void ShowCurrentState()
@@ -52,7 +52,7 @@ namespace HanoiTower
             {
                 for (int j = 0; j < state.Count; j++)
                 {
-                    Console.Write("{0}|", state[j].Count < i ? 0 : state[j].Show());
+                    Console.Write("{0}|", state[j].Count < i ? 0 : state[j][i-1]);
                 }
                 Console.WriteLine();
             }

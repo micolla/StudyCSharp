@@ -10,7 +10,7 @@ namespace HanoiTower
             int blocks;
             int.TryParse(Console.ReadLine(), out blocks);
             HannoiTower dsf = new HannoiTower(blocks);
-            
+            dsf.ShowCurrentState();
             dsf.DoIt();
             dsf.ShowCurrentState();
             Console.ReadLine();
