@@ -33,13 +33,13 @@ namespace Level2.BackGround
             if (Pos.X < 0) Pos.X = Game.Width + Size.Width;
             if(!hasBlinked)
             {
-                Blink(base.Size.Width/4);
+                Blink(1);
                 blinkedIter++;
-                hasBlinked = blinkedIter <= 3 ? false : true;
+                hasBlinked = blinkedIter <= 2 ? false : true;
             }
             else if(hasBlinked)
             {
-                Blink(-base.Size.Width / 4);
+                Blink(-1);
                 blinkedIter--;
                 hasBlinked = blinkedIter > 0 ? true : false;
             }

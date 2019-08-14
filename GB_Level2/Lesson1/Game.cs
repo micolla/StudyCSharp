@@ -34,6 +34,7 @@ namespace Level2
             // Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             MakeStarSky();
+            MakeAsteroids();
             timer = new Timer { Interval = 350 };
             timer.Start();
             timer.Tick += Timer_Tick;
@@ -41,18 +42,28 @@ namespace Level2
 
         public static void MakeStarSky()
         {
-            int starSize = 15;
+            int starSize = 3;
             int cntX, cntY;
-            cntX = Width / (starSize*2);
-            cntY = Height / (starSize*2);
+            cntX = Width / (starSize*21);
+            cntY = Height / (starSize*25);
             
             for (int i = 0; i < cntX; i++)
             {
                 for (int j = 0; j < cntY; j++)
                 {
-                    _objs.Add(new Star(new Point(i*starSize*2, j * starSize * 2), new Point(0, 0), new Size(starSize, starSize)));
+                    _objs.Add(new Star(new Point(i*starSize*21, j * starSize * 25), new Point(1, 0), new Size(starSize, starSize)));
                 }
             }
+        }
+
+        public static void MakeAsteroids()
+        {
+
+        }
+
+        private static void DropAsteroid(Asteroid obj)
+        {
+            _objs.Remove(obj);
         }
 
         //public static void Load()
@@ -66,12 +77,6 @@ namespace Level2
 
         public static void Draw()
         {
-            // Проверяем вывод графики
-            Buffer.Graphics.Clear(Color.Black);
-            Buffer.Graphics.DrawRectangle(Pens.White, new Rectangle(100, 100, 200, 200));
-            Buffer.Graphics.FillEllipse(Brushes.Wheat, new Rectangle(100, 100, 200, 200));
-            Buffer.Render();
-
             Buffer.Graphics.Clear(Color.Black);
             foreach (BaseObject obj in _objs)
                 obj.Draw();
