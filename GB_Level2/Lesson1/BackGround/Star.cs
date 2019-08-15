@@ -14,7 +14,7 @@ namespace Level2.BackGround
         public Star(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
             this.blinkedIter = 0;
-            this.hasBlinked = false;
+            this.hasBlinked = size.Width % 2 == 0 ? false : true;
         }
 
         public void Blink(int brightness)
@@ -26,12 +26,15 @@ namespace Level2.BackGround
         {
             Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X, Pos.Y, Pos.X + Size.Width, Pos.Y + Size.Height);
             Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X + Size.Width, Pos.Y, Pos.X, Pos.Y + Size.Height);
+            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X, Pos.Y + Size.Height / 2, Pos.X + Size.Width, Pos.Y + Size.Height/2);
+            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X + Size.Width / 2, Pos.Y, Pos.X + Size.Width / 2, Pos.Y + Size.Height);
         }
         public override void Update()
         {
             Pos.X -= Dir.X;
-            if (Pos.X < 0) Pos.X = Game.Width + Size.Width;
-            if(!hasBlinked)
+            Pos.Y -= Dir.Y;
+            base.ReturnOnScreen();
+            if (!hasBlinked)
             {
                 Blink(1);
                 blinkedIter++;
