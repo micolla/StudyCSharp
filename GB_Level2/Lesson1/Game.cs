@@ -35,45 +35,62 @@ namespace Level2
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             MakeStarSky();
             MakeAsteroids();
-            timer = new Timer { Interval = 350 };
+            CreateShuttle();
+            timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
         }
 
         public static void MakeStarSky()
         {
-            int starSize = 3;
+
+            int defaultStarSize = 3;
             int cntX, cntY;
-            cntX = Width / (starSize*21);
-            cntY = Height / (starSize*25);
-            
+            cntX = Width / (defaultStarSize * 21);
+            cntY = Height / (defaultStarSize * 25);
+            int[] starSizeArray = new int[] {5,3,6,7,4 };
+            Random rnd = new Random(cntX * cntY);
+            int iter = 0;
             for (int i = 0; i < cntX; i++)
             {
                 for (int j = 0; j < cntY; j++)
                 {
-                    _objs.Add(new Star(new Point(i*starSize*21, j * starSize * 25), new Point(1, 0), new Size(starSize, starSize)));
+                    iter = rnd.Next(0, starSizeArray.Length - 1);
+                    _objs.Add(new Star(new Point(rnd.Next(0,Game.Width), rnd.Next(0, Game.Height)), new Point(j, 0), new Size(starSizeArray[iter], starSizeArray[iter])));
                 }
             }
         }
 
         public static void MakeAsteroids()
         {
-
+            int cnt=5;
+            Random rnd = new Random(cnt);
+            Asteroid tmpAsteroid;
+            for (int i = 0; i < cnt; i++)
+            {
+                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), new Size(6, 25));
+                //tmpAsteroid.AsteroidOutOfSpace += DropAsteroid;
+                _objs.Add(tmpAsteroid);
+            }
         }
 
+        public static void CreateShuttle()
+        {
+            int cnt = 1;
+            try
+            {
+                Image img = Image.FromFile("img\\space_shuttle.jpg");
+                _objs.Add(new SpaceShuttle(new Point(5, Game.Height/2), new Point(0, 0), new Size(25, 25), img));
+            }
+            catch(System.IO.FileNotFoundException e)
+            {
+
+            }
+        }
         private static void DropAsteroid(Asteroid obj)
         {
             _objs.Remove(obj);
         }
-
-        //public static void Load()
-        //{
-        //    _objs = new Star[15];
-        //    for (int i = 0; i < _objs.Length; i++)
-        //    {
-        //        _objs[i] = new Star(new Point(600, i * 20), new Point(15 - i, 15 - i), new Size(20, 20));
-        //    }
-        //}
 
         public static void Draw()
         {

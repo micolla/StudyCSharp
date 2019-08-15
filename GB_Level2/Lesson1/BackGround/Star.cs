@@ -30,8 +30,9 @@ namespace Level2.BackGround
         public override void Update()
         {
             Pos.X -= Dir.X;
-            if (Pos.X < 0) Pos.X = Game.Width + Size.Width;
-            if(!hasBlinked)
+            Pos.Y -= Dir.Y;
+            base.ReturnOnScreen();
+            if (!hasBlinked)
             {
                 Blink(1);
                 blinkedIter++;

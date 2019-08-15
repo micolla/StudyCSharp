@@ -26,10 +26,14 @@ namespace Level2.BackGround
         {
             Pos.X += Dir.X;
             Pos.Y += Dir.Y;
-            if (Pos.X < 0) Dir.X = -Dir.X;
-            if (Pos.X > Game.Width) Dir.X = -Dir.X;
-            if (Pos.Y < 0) Dir.Y = -Dir.Y;
-            if (Pos.Y > Game.Height) Dir.Y = -Dir.Y;
+            this.ReturnOnScreen();
+        }
+        protected void ReturnOnScreen()
+        {
+            if (Pos.X < 0) Pos.X = Game.Width - Size.Width;
+            else if (Pos.X > Game.Width) Pos.X = Size.Width;
+            if (Pos.Y < 0) Pos.Y = Game.Height - Size.Height;
+            else if (Pos.Y > Game.Height) Pos.Y = Size.Height;
         }
     }
 
