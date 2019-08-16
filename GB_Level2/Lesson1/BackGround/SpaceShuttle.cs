@@ -28,14 +28,23 @@ namespace Level2.BackGround
 
         public void MoveShuttle(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Up)
-                this.Move(0,-1);
-            else if (e.KeyCode == System.Windows.Forms.Keys.Down)
-                this.Move(0, 1);
-            else if (e.KeyCode == System.Windows.Forms.Keys.Left)
-                this.Move(-1, 0);
-            else if (e.KeyCode == System.Windows.Forms.Keys.Right)
-                this.Move(1, 0);
+            switch (e.KeyCode)
+            {
+                case System.Windows.Forms.Keys.Up:
+                    this.Move(0, -1);
+                    break;
+                case System.Windows.Forms.Keys.Down:
+                    this.Move(0, 1);
+                    break;
+                case System.Windows.Forms.Keys.Left:
+                    this.Move(-1, 0);
+                    break;
+                case System.Windows.Forms.Keys.Right:
+                    this.Move(1, 0);
+                    break;
+                default:
+                    break;
+            }
         }
         
         private void Move(int moveX,int moveY)
