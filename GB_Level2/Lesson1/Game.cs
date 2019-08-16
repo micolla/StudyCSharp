@@ -35,7 +35,11 @@ namespace Level2
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             MakeStarSky();
             MakeAsteroids();
+<<<<<<< HEAD
             CreateShuttle(form);
+=======
+            CreateShuttle();
+>>>>>>> 95fcab62f22f91386097d3a848e44c6c62bf3882
             timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
@@ -74,6 +78,7 @@ namespace Level2
             }
         }
 
+<<<<<<< HEAD
         public static void CreateShuttle(Form form)
         {
             try
@@ -82,6 +87,15 @@ namespace Level2
                 SpaceShuttle tmplShuttle = new SpaceShuttle(new Point(5, Game.Height / 2), new Point(0, 0), new Size(25, 25), img);
                 form.KeyDown += tmplShuttle.MoveShuttle;
                 _objs.Add(tmplShuttle);                
+=======
+        public static void CreateShuttle()
+        {
+            int cnt = 1;
+            try
+            {
+                Image img = Image.FromFile("img\\space_shuttle.jpg");
+                _objs.Add(new SpaceShuttle(new Point(5, Game.Height/2), new Point(0, 0), new Size(25, 25), img));
+>>>>>>> 95fcab62f22f91386097d3a848e44c6c62bf3882
             }
             catch(System.IO.FileNotFoundException e)
             {

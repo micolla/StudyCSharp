@@ -52,8 +52,5 @@ namespace Level2.BackGround
             base.Pos.X += moveX;
             base.Pos.Y += moveY;
         }
-
     }
-
-
 }

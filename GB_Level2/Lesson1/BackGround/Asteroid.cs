@@ -13,6 +13,7 @@ namespace Level2.BackGround
         int spinSpeed;
         int iterSpin;
         public event Action<Asteroid> AsteroidOutOfSpace;
+
         public Asteroid(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
             spinSpeed = 4;
