@@ -22,35 +22,45 @@ namespace Level2.ActiveObjects
             iterSpin = 0;
             this.Power = 1;
         }
-
+        /// <summary>
+        /// Вращение астероида
+        /// </summary>
         private void Spin()
         {
-            Size.Width = Size.Height ^ Size.Width;
-            Size.Height = Size.Width ^ Size.Height;
-            Size.Width = Size.Width ^ Size.Height;
+            base._rect.Width ^= base._rect.Height;
+            base._rect.Height ^= base._rect.Width;
+            base._rect.Width ^= base._rect.Height;
         }
-
+        /// <summary>
+        /// Отрисовка астероида
+        /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.FillEllipse(Brushes.SaddleBrown, Pos.X, Pos.Y, Size.Width, Size.Height);            
+            Game.Buffer.Graphics.FillEllipse(Brushes.SaddleBrown, base._rect.X, base._rect.Y, base._rect.Width, base._rect.Height);            
         }
+        /// <summary>
+        /// Изменение положения астероида и вращение
+        /// </summary>
         public override void Update()
         {
-            base.Pos.X -= base.Dir.X;
-            base.Pos.Y -= base.Dir.Y;
+            base._rect.X -= base.Dir.X;
+            base._rect.Y -= base.Dir.Y;
             if (++iterSpin == spinSpeed)
             {
                 Spin();
                 iterSpin = 0;
             }
             base.ReturnOnScreen();
-            if ((Pos.X < 0 || Pos.X > Game.Width || Pos.Y < 0 || Pos.Y > Game.Height) && AsteroidOutOfSpace != null)
+            if ((base._rect.X < 0 || base._rect.X > Game.Width || base._rect.Y < 0 || base._rect.Y > Game.Height) && AsteroidOutOfSpace != null)
                 AsteroidOutOfSpace(this);    
         }
+        /// <summary>
+        /// Метод для возобновления в базовом месте
+        /// </summary>
         public void Reset()
         {
-            this.Pos.X = Game.Width - this.Size.Width;
-            this.Pos.Y = Game.Height / 2;
+            base._rect.X = Game.Width - base._rect.Width;
+            base._rect.Y = Game.Height / 2;
         }
     }
 }

@@ -17,23 +17,32 @@ namespace Level2.BackGround
             this.blinkedIter = 0;
             this.hasBlinked = size.Width % 2 == 0 ? false : true;
         }
-
+        /// <summary>
+        /// Мерцание звезды
+        /// </summary>
+        /// <param name="brightness">Величина изменения размера(яркости)</param>
         public void Blink(int brightness)
         {
-            base.Size.Width += brightness;
-            base.Size.Height += brightness;
+            base._rect.Width += brightness;
+            base._rect.Height += brightness;
         }
+        /// <summary>
+        /// Отрисовка звезды в виде текстовой звездочки
+        /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X, Pos.Y, Pos.X + Size.Width, Pos.Y + Size.Height);
-            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X + Size.Width, Pos.Y, Pos.X, Pos.Y + Size.Height);
-            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X, Pos.Y + Size.Height / 2, Pos.X + Size.Width, Pos.Y + Size.Height/2);
-            Game.Buffer.Graphics.DrawLine(Pens.White, Pos.X + Size.Width / 2, Pos.Y, Pos.X + Size.Width / 2, Pos.Y + Size.Height);
+            Game.Buffer.Graphics.DrawLine(Pens.White, base._rect.X, base._rect.Y, base._rect.X + base._rect.Width, base._rect.Y + base._rect.Height);
+            Game.Buffer.Graphics.DrawLine(Pens.White, base._rect.X + base._rect.Width, base._rect.Y, base._rect.X, base._rect.Y + base._rect.Height);
+            Game.Buffer.Graphics.DrawLine(Pens.White, base._rect.X, base._rect.Y + base._rect.Height / 2, base._rect.X + base._rect.Width, base._rect.Y + base._rect.Height/2);
+            Game.Buffer.Graphics.DrawLine(Pens.White, base._rect.X + base._rect.Width / 2, base._rect.Y, base._rect.X + base._rect.Width / 2, base._rect.Y + base._rect.Height);
         }
+        /// <summary>
+        /// Изменение положение и мерцание
+        /// </summary>
         public override void Update()
         {
-            Pos.X -= Dir.X;
-            Pos.Y -= Dir.Y;
+            base._rect.X -= Dir.X;
+            base._rect.Y -= Dir.Y;
             base.ReturnOnScreen();
             if (!hasBlinked)
             {

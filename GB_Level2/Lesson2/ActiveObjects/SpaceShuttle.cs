@@ -15,18 +15,26 @@ namespace Level2.ActiveObjects
         {
             img_src = img;
         }
-
+        /// <summary>
+        /// Отрисовка шатла с помощью изображения
+        /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.DrawImage(this.img_src, base.Pos.X, base.Pos.Y, base.Size.Width, base.Size.Height);
+            Game.Buffer.Graphics.DrawImage(this.img_src, base._rect.X, base._rect.Y, base._rect.Width, base._rect.Height);
         }
+        /// <summary>
+        /// Перемещения Шатала по заданному направлению
+        /// </summary>
         public override void Update()
         {
-            base.Pos.X += base.Dir.X;
-            base.Pos.Y += base.Dir.Y;   
+            Move(base.Dir.X, base.Dir.Y);   
             base.ReturnOnScreen();
         }
-
+        /// <summary>
+        /// Метод для управление движением шатла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void MoveShuttle(object sender, System.Windows.Forms.KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -47,12 +55,21 @@ namespace Level2.ActiveObjects
                     break;
             }
         }
-        
+        /// <summary>
+        /// Перемещение шатла на заданное растояние
+        /// </summary>
+        /// <param name="moveX">отклонение по оси Х</param>
+        /// <param name="moveY">отклонение по оси Y</param>
         private void Move(int moveX,int moveY)
         {
-            base.Pos.X += moveX;
-            base.Pos.Y += moveY;
+            base._rect.X += moveX;
+            base._rect.Y += moveY;
         }
+        /// <summary>
+        /// Заглушка для стрельбы шатлом
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Shoot(object sender, System.Windows.Forms.KeyEventArgs e)
         {
             throw new NotImplementedException();

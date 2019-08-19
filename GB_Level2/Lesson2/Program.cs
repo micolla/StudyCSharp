@@ -16,8 +16,8 @@ namespace Level2
         {
             Form form = new Form
             {
-                Width = Screen.PrimaryScreen.Bounds.Width,
-                Height = Screen.PrimaryScreen.Bounds.Height
+                Width = 800,//Screen.PrimaryScreen.Bounds.Width,
+                Height = 600//Screen.PrimaryScreen.Bounds.Height
             };
             Game.Init(form);
             form.Show();

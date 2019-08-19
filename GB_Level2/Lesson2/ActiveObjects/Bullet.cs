@@ -13,19 +13,28 @@ namespace Level2.ActiveObjects
         public Bullet(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
         }
+        /// <summary>
+        /// Отрисовка пули в виде прямоугольника
+        /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.DrawRectangle(Pens.OrangeRed, Pos.X, Pos.Y, Size.Width, Size.Height);
+            Game.Buffer.Graphics.DrawRectangle(Pens.OrangeRed, base._rect.X, base._rect.Y, base._rect.Width, base._rect.Height);
         }
+        /// <summary>
+        /// движение пули 
+        /// </summary>
         public override void Update()
         {
-            Pos.X += Dir.X;
+            base._rect.X += Dir.X;
             base.ReturnOnScreen();
         }
+        /// <summary>
+        /// Метод для возобновления в базовом месте
+        /// </summary>
         public void Reset()
         {
-            this.Pos.X = 25;
-            this.Pos.Y = Game.Height / 2;
+            base._rect.X = 25;
+            base._rect.Y = Game.Height / 2;
         }
     }
 }

@@ -21,13 +21,18 @@ namespace Level2
         public static int Height { get; set; }
 
         public static List<BaseObject> _objs;
+        public static Bullet _bullet;
         private static Timer timer;
-
+        /// <summary>
+        /// Инициализация игры Game
+        /// </summary>
+        /// <param name="form">Форма для связывания с игрой</param>
         public static void Init(Form form)
         {
-            // Графическое устройство для вывода графики            
+            if (form.ClientSize.Width > 1000 || form.ClientSize.Height > 1000 || form.ClientSize.Width < 0 || form.ClientSize.Height < 0)
+                throw new ArgumentOutOfRangeException("form.ClientSize"
+                    , $"Переданы неверные размеры окна {form.ClientSize.Width} и {form.ClientSize.Height}");
             Graphics g;
-            // Предоставляет доступ к главному буферу графического контекста для текущего приложения
             _context = BufferedGraphicsManager.Current;
             g = form.CreateGraphics();
             _objs = new List<BaseObject>();
@@ -38,13 +43,14 @@ namespace Level2
             MakeStarSky();
             MakeAsteroids();
             CreateShuttle(form);
-            _objs.Add(new Bullet(new Point(0, 200), new Point(5, 0), new Size(4, 1)));
-            //_objs.Add(new Asteroid(new Point(0, 200), new Point(0, 0), new Size(6, 25)));
+            _bullet = new Bullet(new Point(0, Game.Height / 2), new Point(5, 0), new Size(4, 1));
             timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
         }
-
+        /// <summary>
+        /// Создание звездного движущегося неба
+        /// </summary>
         public static void MakeStarSky()
         {
 
@@ -60,11 +66,14 @@ namespace Level2
                 for (int j = 0; j < cntY; j++)
                 {
                     iter = rnd.Next(0, starSizeArray.Length - 1);
-                    _objs.Add(new Star(new Point(rnd.Next(0,Game.Width), rnd.Next(0, Game.Height)), new Point(j, 0), new Size(starSizeArray[iter], starSizeArray[iter])));
+                    _objs.Add(new Star(new Point(rnd.Next(0,Game.Width), rnd.Next(0, Game.Height))
+                        , new Point(j, 0), new Size(starSizeArray[iter], starSizeArray[iter])));
                 }
             }
         }
-
+        /// <summary>
+        /// Создание метеоритного дождя
+        /// </summary>
         public static void MakeAsteroids()
         {
             int cnt=25;
@@ -76,7 +85,10 @@ namespace Level2
                 _objs.Add(tmpAsteroid);
             }
         }
-
+        /// <summary>
+        /// Установка шатла
+        /// </summary>
+        /// <param name="form">Форма для связи с событием KeyDown</param>
         public static void CreateShuttle(Form form)
         {
             try
@@ -88,38 +100,45 @@ namespace Level2
             }
             catch(System.IO.FileNotFoundException e)
             {
-
+                ///игнорирование ошибок
             }
         }
+        /// <summary>
+        /// Прорисовка всех объектов в игре
+        /// </summary>
         public static void Draw()
         {
             Buffer.Graphics.Clear(Color.Black);
+            _bullet.Draw();
             foreach (BaseObject obj in _objs)
                 obj.Draw();
             Buffer.Render();
         }
-
+        /// <summary>
+        /// Вызов методов для изменения состояния игорвых объектов
+        /// </summary>
         public static void Update()
         {
-            Bullet tmpBul=null;
-            Asteroid tmpAst=null;
+            _bullet.Update();
             foreach (BaseObject obj in _objs)
             {
-                if (obj is Bullet)
-                    tmpBul = obj as Bullet;
+                obj.Update();
                 if (obj is Asteroid)
-                    tmpAst = obj as Asteroid;
-                if(tmpBul!=null && tmpAst!=null)
                 {
-                    if (tmpBul.Collision(tmpAst))
+                    if (obj.Collision(_bullet))
                     {
-                        tmpBul.Reset();
-                        tmpAst.Reset();
+                        _bullet.Reset();
+                        (obj as Asteroid).Reset();
+                        Game.Buffer.Graphics.DrawString("Intersect", new Font(FontFamily.GenericSerif,14), Brushes.White, new Point(5, 6));
                     }
                 }
-                obj.Update();
             }
         }
+        /// <summary>
+        /// Метод для работы с событиями таймера
+        /// </summary>
+        /// <param name="sender">Вызывающий объект</param>
+        /// <param name="e">Аргументы события</param>
         private static void Timer_Tick(object sender, EventArgs e)
         {
             Draw();

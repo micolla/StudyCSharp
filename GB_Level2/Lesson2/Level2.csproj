@@ -50,6 +50,7 @@
     <Compile Include="AbstractClasses\BaseObject.cs" />
     <Compile Include="ActiveObjects\Bullet.cs" />
     <Compile Include="BackGround\Star.cs" />
+    <Compile Include="exceptions\GameObjectException.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
