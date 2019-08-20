@@ -29,17 +29,14 @@ namespace Level2
         /// <param name="form">Форма для связывания с игрой</param>
         public static void Init(Form form)
         {
-            if (form.ClientSize.Width > 1000 || form.ClientSize.Height > 1000 || form.ClientSize.Width < 0 || form.ClientSize.Height < 0)
-                throw new ArgumentOutOfRangeException("form.ClientSize"
-                    , $"Переданы неверные размеры окна {form.ClientSize.Width} и {form.ClientSize.Height}");
-            Graphics g;
-            _context = BufferedGraphicsManager.Current;
-            g = form.CreateGraphics();
-            _objs = new List<BaseObject>();
+            CheckWindowSize(form);
+            Graphics g = form.CreateGraphics();
             Width = form.ClientSize.Width;
             Height = form.ClientSize.Height;
+            _context = BufferedGraphicsManager.Current;
             // Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
+            _objs = new List<BaseObject>();
             MakeStarSky();
             MakeAsteroids();
             CreateShuttle(form);
@@ -47,7 +44,39 @@ namespace Level2
             timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
+            form.ResizeEnd += Form_SizeChanged;
         }
+        /// <summary>
+        /// Проверка размеров формы
+        /// </summary>
+        /// <param name="form"></param>
+        private static void CheckWindowSize(Form form)
+        {
+            if (form.ClientSize.Width > 1000 || form.ClientSize.Height > 1000 || form.ClientSize.Width < 0 || form.ClientSize.Height < 0)
+                throw new ArgumentOutOfRangeException("form.ClientSize"
+                    , $"Переданы неверные размеры окна {form.ClientSize.Width} и {form.ClientSize.Height}");
+        }
+
+        /// <summary>
+        /// Перерисовка игрового поля при изменении размера игрового поля
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Form_SizeChanged(object sender, EventArgs e)
+        {
+            if (sender is Form)
+            {
+                CheckWindowSize(sender as Form);
+                Width = (sender as Form).ClientSize.Width;
+                Height = (sender as Form).ClientSize.Height;
+                _objs.RemoveRange(0,_objs.Count);
+                MakeStarSky();
+                MakeAsteroids();
+                CreateShuttle(sender as Form);
+            }
+
+        }
+
         /// <summary>
         /// Создание звездного движущегося неба
         /// </summary>
@@ -76,12 +105,13 @@ namespace Level2
         /// </summary>
         public static void MakeAsteroids()
         {
-            int cnt=25;
+            Size asteroidSize = new Size(12, 28);
+            int cnt = Game.Width * Game.Height/(asteroidSize.Width*asteroidSize.Height*35);
             Random rnd = new Random(cnt);
             Asteroid tmpAsteroid;
             for (int i = 0; i < cnt; i++)
             {
-                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), new Size(12, 28));
+                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize);
                 _objs.Add(tmpAsteroid);
             }
         }
