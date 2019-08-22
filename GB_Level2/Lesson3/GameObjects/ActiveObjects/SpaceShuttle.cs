@@ -19,22 +19,26 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
         private BulletSpeed bulletsSpeed;
         public int Energy { get; private set; }
         public int Health { get; private set; }
+        private int energyRegenration;
+        private int iter;
 
         public SpaceShuttle(Point pos, Size size, Image img) : base(pos, size)
         {
             img_src = img;
-            base.Power = 5;
+            base.Power = 48;
             clip = new Stack<Bullet>();
-            bulletsPower = BulletPower.Simple;
-            bulletsSpeed = BulletSpeed.Simple;
+            bulletsPower = BulletPower.PowerFull;
+            bulletsSpeed = BulletSpeed.Fast;
             Energy = 100;
             Health = 100;
-        }
-        /// <summary>
-        /// Изменить энергию коробля в случае выстрела или с течением времени
-        /// </summary>
-        /// <param name="deltaEnergy">Величина изменения энергии</param>
-        public void ChangeEnergy(int deltaEnergy)
+            energyRegenration = 15;
+
+    }
+    /// <summary>
+    /// Изменить энергию коробля в случае выстрела или с течением времени
+    /// </summary>
+    /// <param name="deltaEnergy">Величина изменения энергии</param>
+    public void ChangeEnergy(int deltaEnergy)
         {
             Energy += deltaEnergy;
             if (Energy <= 0)
@@ -75,8 +79,13 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
         /// </summary>
         public override void Update()
         {
-            //Move(base.Dir.X, base.Dir.Y);
-            //base.ReturnOnScreen();
+            if(iter<energyRegenration)
+                iter++;
+            else
+            {
+                iter = 0;
+                ChangeEnergy(1);
+            }
         }
         /// <summary>
         /// Перемещение шатла на заданное растояние
@@ -98,7 +107,7 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
             Bullet tmpBull;
             if (Energy < (int)bulletsPower)
             {
-                tmpBull = new Bullet(new Point(-1,-1), 0, 0, new Size(4, 2));
+                tmpBull =null;
                 ShuttleEnergyLowEvent?.Invoke();
                 base.WriteLog($"ShuttleEnergyLow:{Energy}");
             }
@@ -113,7 +122,7 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
                     tmpBull.ChangePowerSpeed(this.bulletsSpeed, this.bulletsPower);
                 }
                 tmpBull.BulletIsOut += FillClip;
-                ChangeEnergy(tmpBull.Power);
+                ChangeEnergy(-tmpBull.Power);
                 base.WriteLog($"Shuttle Shoot:bulletPower{tmpBull.Power}");
             }
             return tmpBull;
@@ -137,7 +146,7 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
         /// <param name="power">Мощность вражеского объекта</param>
         public override void Distruct(int power)
         {
-            ChangeHealth(power);
+            ChangeHealth(-power);
             if (Health <= 0)
                 ShuttleDieEvent?.Invoke();
         }

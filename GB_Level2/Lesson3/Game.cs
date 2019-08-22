@@ -79,23 +79,38 @@ namespace Level2_Lesson2
             switch (e.KeyCode)
             {
                 case System.Windows.Forms.Keys.Up:
-                    _shuttle.MoveShuttle(0, -1);
+                    _shuttle.MoveShuttle(0, -15);
                     break;
                 case System.Windows.Forms.Keys.Down:
-                    _shuttle.MoveShuttle(0, 1);
+                    _shuttle.MoveShuttle(0, 15);
                     break;
                 case System.Windows.Forms.Keys.Left:
-                    _shuttle.MoveShuttle(-1, 0);
+                    _shuttle.MoveShuttle(-15, 0);
                     break;
                 case System.Windows.Forms.Keys.Right:
-                    _shuttle.MoveShuttle(1, 0);
+                    _shuttle.MoveShuttle(15, 0);
                     break;
                 case System.Windows.Forms.Keys.Space:
-                    _bullets.Add(_shuttle.Shoot());
+                    Bullet tmp = _shuttle.Shoot();
+                    if (tmp != null)
+                    {
+                        tmp.BulletIsOut += HideBullet;
+                        _bullets.Add(tmp);
+                    }
                     break;
                 default:
                     break;
             }
+        }
+        /// <summary>
+        /// Убрать пулю из списка обновления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void HideBullet(object sender, EventArgs e)
+        {
+            _bullets[_bullets.IndexOf(sender as Bullet)] = null;
+            (sender as Bullet).BulletIsOut -= HideBullet;
         }
 
         /// <summary>
@@ -158,21 +173,21 @@ namespace Level2_Lesson2
         private static void MakeAsteroids(List<ActiveObject> ao)
         {
             Size asteroidSize = new Size(12, 28);
-            int cnt = Game.Width * Game.Height / (asteroidSize.Width * asteroidSize.Height * 35);
+            int cnt = Game.Width * Game.Height / (asteroidSize.Width * asteroidSize.Height * 60);
             Random rnd = new Random(cnt);
             Asteroid tmpAsteroid;
             for (int i = 0; i < cnt; i++)
             {
-                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize,rnd.Next(1,15));
+                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize,rnd.Next(1,14));
                 tmpAsteroid.LogAction += ShowLogs;
-                tmpAsteroid.AsteroidExploded += AsteroidDestroyed;
+                tmpAsteroid.AsteroidHit += AsteroidHit;
                 ao.Add(tmpAsteroid);
             }
         }
 
-        private static void AsteroidDestroyed(object sender, EventArgs e)
+        private static void AsteroidHit(Asteroid ast, int score)
         {
-            gameScore += (sender as Asteroid).Power;
+            gameScore += score;
             ShowLogs($"GameScore: {gameScore}");
         }
 
@@ -201,13 +216,13 @@ namespace Level2_Lesson2
         public static void Draw()
         {
             Buffer.Graphics.Clear(Color.Black);
-            _shuttle.Draw(Game.Buffer);
+            _shuttle?.Draw(Game.Buffer);
             foreach (BaseObject obj in _bullets)
-                obj.Draw(Game.Buffer);
+                obj?.Draw(Game.Buffer);
             foreach (BaseObject obj in _backGroundObjects)
-                obj.Draw(Game.Buffer);
+                obj?.Draw(Game.Buffer);
             foreach (BaseObject obj in _activeObjects)
-                obj.Draw(Game.Buffer);
+                obj?.Draw(Game.Buffer);
             Buffer.Graphics.DrawString($"ShuttleHealth {_shuttle.Health}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 1);
             Buffer.Graphics.DrawString($"ShuttleEnergy {_shuttle.Energy}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 15);
             Buffer.Graphics.DrawString($"GameScore {gameScore}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, Game.Width-100, 1);
@@ -219,19 +234,27 @@ namespace Level2_Lesson2
         public static void Update()
         {
             _shuttle.Update();
-            foreach (BaseObject obj in _bullets)
-                obj.Update();
+            for (int i = 0; i < _bullets.Count; i++)
+            {
+                _bullets[i]?.Update();
+            }
             foreach (BaseObject obj in _backGroundObjects)
                 obj.Update();
-            foreach (ActiveObject obj in _activeObjects)
+            for (int a = 0; a < _activeObjects.Count; a++)
             {
-                obj.Update();
-                foreach (Bullet bull in _bullets)
-                    if (bull.Collision(obj))
+                if (_activeObjects[a] != null)
+                {
+                    _activeObjects[a].Update();
+                    _shuttle.Collision(_activeObjects[a]);
+                    for (int i = 0; i < _bullets.Count; i++)
                     {
-                        _bullets.Remove(bull);// Исключение пули из списка
+                        if (_bullets[i] != null)
+                            _bullets[i].Collision(_activeObjects[a]);
                     }
+                }
             }
+            _bullets.Remove(null);
+            _activeObjects.Remove(null);
         }
         /// <summary>
         /// Метод для работы с событиями таймера
