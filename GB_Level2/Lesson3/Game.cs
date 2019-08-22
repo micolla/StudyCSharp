@@ -13,19 +13,40 @@ namespace Level2_Lesson2
 {
     static class Game
     {
+        #region VariablesDesctiption
         private static BufferedGraphicsContext _context;
-        public static BufferedGraphics Buffer;
-        // Свойства
-        // Ширина и высота игрового поля
+        private static BufferedGraphics Buffer;
+        /// <summary>
+        /// высота игрового поля
+        /// </summary>
         public static int Width { get; set; }
+        /// <summary>
+        /// Ширина игрового поля
+        /// </summary>
         public static int Height { get; set; }
-
-        public static List<BackGroundObject> _backGroundObjects;
-        public static List<Bullet> _bullets;
-        public static List<ActiveObject> _activeObjects;
-        public static SpaceShuttle _shuttle;
+        /// <summary>
+        /// Cписок объектов фона
+        /// </summary>
+        private static List<BackGroundObject> _backGroundObjects;
+        /// <summary>
+        /// Список пуль
+        /// </summary>
+        private static List<Bullet> _bullets;
+        /// <summary>
+        /// Список объектов с возможностью взаимодействия
+        /// </summary>
+        private static List<ActiveObject> _activeObjects;
+        /// <summary>
+        /// Корабль игрока
+        /// </summary>
+        private static SpaceShuttle _shuttle;
+        /// <summary>
+        /// Таймер для управления игровым циклом
+        /// </summary>
         private static Timer timer;
+        private static int gameScore;
 
+        #endregion
         /// <summary>
         /// Инициализация игры Game
         /// </summary>
@@ -42,6 +63,7 @@ namespace Level2_Lesson2
             _backGroundObjects = new List<BackGroundObject>();
             _bullets = new List<Bullet>();
             _activeObjects = new List<ActiveObject>();
+            gameScore = 0;
             MakeStarSky(_backGroundObjects);
             MakeAsteroids(_activeObjects);
             _shuttle = CreateShuttle();
@@ -57,16 +79,16 @@ namespace Level2_Lesson2
             switch (e.KeyCode)
             {
                 case System.Windows.Forms.Keys.Up:
-                    _shuttle.Move(0, -1);
+                    _shuttle.MoveShuttle(0, -1);
                     break;
                 case System.Windows.Forms.Keys.Down:
-                    _shuttle.Move(0, 1);
+                    _shuttle.MoveShuttle(0, 1);
                     break;
                 case System.Windows.Forms.Keys.Left:
-                    _shuttle.Move(-1, 0);
+                    _shuttle.MoveShuttle(-1, 0);
                     break;
                 case System.Windows.Forms.Keys.Right:
-                    _shuttle.Move(1, 0);
+                    _shuttle.MoveShuttle(1, 0);
                     break;
                 case System.Windows.Forms.Keys.Space:
                     _bullets.Add(_shuttle.Shoot());
@@ -141,10 +163,19 @@ namespace Level2_Lesson2
             Asteroid tmpAsteroid;
             for (int i = 0; i < cnt; i++)
             {
-                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize);
+                tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize,rnd.Next(1,15));
+                tmpAsteroid.LogAction += ShowLogs;
+                tmpAsteroid.AsteroidExploded += AsteroidDestroyed;
                 ao.Add(tmpAsteroid);
             }
         }
+
+        private static void AsteroidDestroyed(object sender, EventArgs e)
+        {
+            gameScore += (sender as Asteroid).Power;
+            ShowLogs($"GameScore: {gameScore}");
+        }
+
         /// <summary>
         /// Установка шатла
         /// </summary>
@@ -155,7 +186,9 @@ namespace Level2_Lesson2
             {
                 Image img = Image.FromFile(@"img\space_shuttle.jpg");
                 SpaceShuttle tmplShuttle = new SpaceShuttle(new Point(5, Game.Height / 2), new Size(25, 25), img);
-                return new SpaceShuttle(new Point(5, Game.Height / 2), new Size(25, 25), img);
+                tmplShuttle.LogAction += ShowLogs;
+                tmplShuttle.ShuttleDieEvent += Finish;
+                return tmplShuttle;
             }
             catch (System.IO.FileNotFoundException e)
             {
@@ -175,6 +208,9 @@ namespace Level2_Lesson2
                 obj.Draw(Game.Buffer);
             foreach (BaseObject obj in _activeObjects)
                 obj.Draw(Game.Buffer);
+            Buffer.Graphics.DrawString($"ShuttleHealth {_shuttle.Health}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 1);
+            Buffer.Graphics.DrawString($"ShuttleEnergy {_shuttle.Energy}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 15);
+            Buffer.Graphics.DrawString($"GameScore {gameScore}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, Game.Width-100, 1);
             Buffer.Render();
         }
         /// <summary>
@@ -187,8 +223,15 @@ namespace Level2_Lesson2
                 obj.Update();
             foreach (BaseObject obj in _backGroundObjects)
                 obj.Update();
-            foreach (BaseObject obj in _activeObjects)
+            foreach (ActiveObject obj in _activeObjects)
+            {
                 obj.Update();
+                foreach (Bullet bull in _bullets)
+                    if (bull.Collision(obj))
+                    {
+                        _bullets.Remove(bull);// Исключение пули из списка
+                    }
+            }
         }
         /// <summary>
         /// Метод для работы с событиями таймера
@@ -200,5 +243,23 @@ namespace Level2_Lesson2
             Draw();
             Update();
         }
+        /// <summary>
+        /// Окончание игры
+        /// </summary>
+        public static void Finish()
+        {
+            timer.Stop();
+            Buffer.Graphics.DrawString("The End", new Font(FontFamily.GenericSansSerif, 60, FontStyle.Underline), Brushes.White, 200, 100);
+            Buffer.Render();
+        }
+        /// <summary>
+        /// Вывод логов на экран
+        /// </summary>
+        /// <param name="msg">Сообщение лога</param>
+        public static void ShowLogs(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+        
     }
 }
