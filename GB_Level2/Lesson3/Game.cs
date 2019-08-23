@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.IO;
 using Level2_Lesson2.GameObjects.AbstractClasses;
 using Level2_Lesson2.GameObjects.BackgroundClasses;
 using Level2_Lesson2.GameObjects.ActiveObjects;
@@ -14,6 +15,7 @@ namespace Level2_Lesson2
     static class Game
     {
         #region VariablesDesctiption
+        private const string logFilePath=@"log.txt";
         private static BufferedGraphicsContext _context;
         private static BufferedGraphics Buffer;
         /// <summary>
@@ -40,6 +42,8 @@ namespace Level2_Lesson2
         /// Корабль игрока
         /// </summary>
         private static SpaceShuttle _shuttle;
+        private static AidKit _aid;
+        private static Stack<AidKit> aidStack;
         /// <summary>
         /// Таймер для управления игровым циклом
         /// </summary>
@@ -53,6 +57,7 @@ namespace Level2_Lesson2
         /// <param name="form">Форма для связывания с игрой</param>
         public static void Init(Form form)
         {
+            CreateLogFile();
             CheckWindowSize(form);
             Graphics g = form.CreateGraphics();
             Width = form.ClientSize.Width;
@@ -63,17 +68,53 @@ namespace Level2_Lesson2
             _backGroundObjects = new List<BackGroundObject>();
             _bullets = new List<Bullet>();
             _activeObjects = new List<ActiveObject>();
-            gameScore = 0;
+            aidStack = new Stack<AidKit>();
+             gameScore = 0;
             MakeStarSky(_backGroundObjects);
             MakeAsteroids(_activeObjects);
             _shuttle = CreateShuttle();
+            PrepareAids(aidStack);
+            _aid = null;
             form.KeyDown += ControlKeyDown;
             timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
             form.ResizeEnd += Form_SizeChanged;
         }
-
+        /// <summary>
+        /// Подготовка файла для лога
+        /// </summary>
+        private static void CreateLogFile()
+        {
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath);
+            }
+        }
+        /// <summary>
+        /// Инициализация аптечки
+        /// </summary>
+        /// <param name="said">Стек для хранения аптечек на выдачу</param>
+        private static void PrepareAids(Stack<AidKit> said)
+        {
+            AidKit tmpa = new AidKit(new Point(250, 400), new Size(20, 20));
+            tmpa.AidGot+=AidCatched;
+            said.Push(tmpa);
+        }
+        /// <summary>
+        /// В случае взятия аптечки прячим её до следующего раза
+        /// </summary>
+        /// <param name="obj">Аптечка, которую поймали</param>
+        private static void AidCatched(AidKit obj)
+        {
+            aidStack.Push(obj);
+            _aid = null;
+        }
+        /// <summary>
+        /// Управление действиями шатла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">KeyEventArgs</param>
         private static void ControlKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -180,15 +221,21 @@ namespace Level2_Lesson2
             {
                 tmpAsteroid = new Asteroid(new Point(rnd.Next(0, Game.Width), rnd.Next(0, Game.Height)), new Point(6, 1), asteroidSize,rnd.Next(1,14));
                 tmpAsteroid.LogAction += ShowLogs;
+                tmpAsteroid.LogAction += WriteLogs;
                 tmpAsteroid.AsteroidHit += AsteroidHit;
                 ao.Add(tmpAsteroid);
             }
         }
-
+        /// <summary>
+        /// Подсчет очков при сбитии астероида
+        /// </summary>
+        /// <param name="ast">Астероид</param>
+        /// <param name="score">количество очков за негоы</param>
         private static void AsteroidHit(Asteroid ast, int score)
         {
             gameScore += score;
             ShowLogs($"GameScore: {gameScore}");
+            WriteLogs($"GameScore: {gameScore}");
         }
 
         /// <summary>
@@ -202,6 +249,7 @@ namespace Level2_Lesson2
                 Image img = Image.FromFile(@"img\space_shuttle.jpg");
                 SpaceShuttle tmplShuttle = new SpaceShuttle(new Point(5, Game.Height / 2), new Size(25, 25), img);
                 tmplShuttle.LogAction += ShowLogs;
+                tmplShuttle.LogAction += WriteLogs;
                 tmplShuttle.ShuttleDieEvent += Finish;
                 return tmplShuttle;
             }
@@ -223,6 +271,7 @@ namespace Level2_Lesson2
                 obj?.Draw(Game.Buffer);
             foreach (BaseObject obj in _activeObjects)
                 obj?.Draw(Game.Buffer);
+            _aid?.Draw(Game.Buffer);
             Buffer.Graphics.DrawString($"ShuttleHealth {_shuttle.Health}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 1);
             Buffer.Graphics.DrawString($"ShuttleEnergy {_shuttle.Energy}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, 1, 15);
             Buffer.Graphics.DrawString($"GameScore {gameScore}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, Game.Width-100, 1);
@@ -234,6 +283,8 @@ namespace Level2_Lesson2
         public static void Update()
         {
             _shuttle.Update();
+            if (_aid != null)
+                _shuttle.Collision(_aid);
             for (int i = 0; i < _bullets.Count; i++)
             {
                 _bullets[i]?.Update();
@@ -255,6 +306,8 @@ namespace Level2_Lesson2
             }
             _bullets.Remove(null);
             _activeObjects.Remove(null);
+            if (_shuttle.Health < 50 && aidStack.Count > 0)
+                _aid = aidStack.Pop();
         }
         /// <summary>
         /// Метод для работы с событиями таймера
@@ -272,7 +325,8 @@ namespace Level2_Lesson2
         public static void Finish()
         {
             timer.Stop();
-            Buffer.Graphics.DrawString("The End", new Font(FontFamily.GenericSansSerif, 60, FontStyle.Underline), Brushes.White, 200, 100);
+            Buffer.Graphics.DrawString($"The End \nfinalScore {gameScore}", new Font(FontFamily.GenericSansSerif, 40, FontStyle.Underline),
+                Brushes.White, Game.Width/2-55, Game.Height/2);
             Buffer.Render();
         }
         /// <summary>
@@ -283,6 +337,24 @@ namespace Level2_Lesson2
         {
             Console.WriteLine(msg);
         }
-        
+        /// <summary>
+        /// Запись в файловый лог
+        /// </summary>
+        /// <param name="msg">Сообщение лога</param>
+        public static void WriteLogs(string msg)
+        {
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(logFilePath, true, Encoding.UTF8))
+                {
+                    sw.WriteLine(msg);
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw new GameObjects.Exceptions.GameObjectException(e.Message);
+            }
+        }
     }
 }

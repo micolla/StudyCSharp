@@ -49,6 +49,7 @@
     <Compile Include="GameObjects\AbstractClasses\ActiveObject.cs" />
     <Compile Include="GameObjects\AbstractClasses\BackGroundObject.cs" />
     <Compile Include="GameObjects\AbstractClasses\BaseObject.cs" />
+    <Compile Include="GameObjects\ActiveObjects\AidKit.cs" />
     <Compile Include="GameObjects\ActiveObjects\Asteroid.cs" />
     <Compile Include="GameObjects\ActiveObjects\Bullet.cs" />
     <Compile Include="GameObjects\ActiveObjects\SpaceShuttle.cs" />

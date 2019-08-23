@@ -32,8 +32,7 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
             Energy = 100;
             Health = 100;
             energyRegenration = 15;
-
-    }
+        }
     /// <summary>
     /// Изменить энергию коробля в случае выстрела или с течением времени
     /// </summary>
