@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
-using Level2_Lesson2.GameObjects.AbstractClasses;
-using Level2_Lesson2.GameObjects.BackgroundClasses;
-using Level2_Lesson2.GameObjects.ActiveObjects;
 using Level2_Lesson2.GameObjects.Fabrics;
 
 namespace Level2_Lesson2
@@ -27,7 +21,6 @@ namespace Level2_Lesson2
         /// Ширина игрового поля
         /// </summary>
         public static int Height { get; set; }
-        private static Stack<AidKit> aidStack;
         /// <summary>
         /// Таймер для управления игровым циклом
         /// </summary>
@@ -42,7 +35,6 @@ namespace Level2_Lesson2
         /// <param name="form">Форма для связывания с игрой</param>
         public static void Init(Form form)
         {
-            CreateLogFile();
             CheckWindowSize(form);
             Graphics g = form.CreateGraphics();
             Width = form.ClientSize.Width;
@@ -50,7 +42,6 @@ namespace Level2_Lesson2
             _context = BufferedGraphicsManager.Current;
             // Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
-            aidStack = new Stack<AidKit>();
             gameScore = 0;
             gameClient = new GameClient(new GameLevelOneFactory(),Game.Width,Game.Height);
             SubcribeEvent();
@@ -60,6 +51,9 @@ namespace Level2_Lesson2
             timer.Tick += Timer_Tick;
             form.ResizeEnd += Form_SizeChanged;
         }
+        /// <summary>
+        /// Подписка на события игрового клиента
+        /// </summary>
         private static void SubcribeEvent()
         {
             gameClient.GameClientLog += WriteLogs;
@@ -89,17 +83,6 @@ namespace Level2_Lesson2
             gameClient.Draw(Buffer);
             Buffer.Graphics.DrawString($"GameScore {gameScore}", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Underline), Brushes.White, Game.Width - 100, 1);
             Buffer.Render();
-        }
-
-        /// <summary>
-        /// Подготовка файла для лога
-        /// </summary>
-        private static void CreateLogFile()
-        {
-            if (!File.Exists(logFilePath))
-            {
-                File.Create(logFilePath);
-            }
         }
         /// <summary>
         /// Управление действиями шатла

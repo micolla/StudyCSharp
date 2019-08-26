@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using Level2_Lesson2.GameObjects.AbstractClasses;
-using Level2_Lesson2.GameObjects.ActiveObjects;
 using Level2_Lesson2.GameObjects.Interfaces;
 
 namespace Level2_Lesson2.GameObjects.ActiveObjects
@@ -14,7 +13,7 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
     {
         public event Action ShuttleDieEvent;
         public event Action ShuttleEnergyLowEvent;
-        Image img_src;
+        private Image img_src;
         private Stack<Bullet> clip;
         private List<Bullet> shootedBullets;
         private BulletPower bulletsPower;
@@ -163,7 +162,10 @@ namespace Level2_Lesson2.GameObjects.ActiveObjects
             if (Health <= 0)
                 ShuttleDieEvent?.Invoke();
         }
-
+        /// <summary>
+        /// Проверка на пересечение с объектами
+        /// </summary>
+        /// <param name="obj"></param>
         public override void Collision(ICollision obj)
         {
             base.Collision(obj);

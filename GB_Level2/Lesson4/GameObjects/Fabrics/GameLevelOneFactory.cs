@@ -10,6 +10,9 @@ using System.Drawing;
 
 namespace Level2_Lesson2.GameObjects.Fabrics
 {
+    /// <summary>
+    /// Фабрика для создания объектов 1 уровня
+    /// </summary>
     class GameLevelOneFactory : AbstractGameFactory
     {
         /// <summary>

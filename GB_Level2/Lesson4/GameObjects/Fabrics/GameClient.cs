@@ -9,6 +9,9 @@ using Level2_Lesson2.GameObjects.AbstractClasses;
 
 namespace Level2_Lesson2.GameObjects.Fabrics
 {
+    /// <summary>
+    /// Совокупность игровых объектов
+    /// </summary>
     class GameClient
     {
         /// <summary>
@@ -50,7 +53,13 @@ namespace Level2_Lesson2.GameObjects.Fabrics
             _aidsClip.Push(obj);
             _aid = null;
         }
-
+        /// <summary>
+        /// Управление кораблем
+        /// </summary>
+        /// <param name="moveX">Дельта Х</param>
+        /// <param name="moveY">Дельта У</param>
+        /// <param name="fieldWidth">Ширина игрового поля</param>
+        /// <param name="fieldHeight">Высота игрового поля</param>
         public void MoveShuttle(int moveX, int moveY,int fieldWidth,int fieldHeight)
         {
             if (_shuttle.Rect.Y + moveY + _shuttle.Rect.Height > fieldHeight)
@@ -63,6 +72,9 @@ namespace Level2_Lesson2.GameObjects.Fabrics
                 moveX = 0;
             _shuttle.MoveShuttle(moveX, moveY);
         }
+        /// <summary>
+        /// Выстрел корабля
+        /// </summary>
         public void ShuttleShoot()
         {
             _shuttle.Shoot();
@@ -136,10 +148,17 @@ namespace Level2_Lesson2.GameObjects.Fabrics
             GetLog($"GameScore: +{score}");
             this.GameScoreChange?.Invoke(score);
         }
+        /// <summary>
+        /// Запись лога
+        /// </summary>
+        /// <param name="msg">Сообщение</param>
         private void GetLog(string msg)
         {
             this.GameClientLog?.Invoke(msg);
         }
+        /// <summary>
+        /// Окончание игры
+        /// </summary>
         private void GameOver()
         {
             this.GameOverEvent?.Invoke();

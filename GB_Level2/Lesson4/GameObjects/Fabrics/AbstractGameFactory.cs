@@ -8,6 +8,9 @@ using Level2_Lesson2.GameObjects.AbstractClasses;
 
 namespace Level2_Lesson2.GameObjects.Fabrics
 {
+    /// <summary>
+    /// Фабрика для создания игровых объектов разных уровней
+    /// </summary>
     abstract class AbstractGameFactory
     {
         public abstract List<ActiveObject> MakeActiveObjects(int width, int height);
