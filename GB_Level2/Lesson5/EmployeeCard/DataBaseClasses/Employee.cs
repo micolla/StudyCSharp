@@ -12,26 +12,32 @@ namespace EmployeeCard.DataBaseClasses
         public string SecondName { get; private set; }
         public DateTime BirthDay { get; private set; }
         public Document EmployeeDocument { get; private set; }
+        public Department Department { get; private set; }
         private Employee(string firstName, string secondName, DateTime birthDay)
         {
             this.FirstName = firstName;
             this.SecondName = secondName;
             this.BirthDay = birthDay.Date;
         }
-        public Employee(string firstName, string secondName, DateTime birthDay, Document employeeDocument)
+        public Employee(string firstName, string secondName, DateTime birthDay, Document employeeDocument, Department department)
             : this(firstName, secondName, birthDay)
-            => this.EmployeeDocument = employeeDocument;
+        {
+            this.EmployeeDocument = employeeDocument;
+            this.Department = department;
+        }
         public Employee(string firstName, string secondName, DateTime birthDay
-            ,Document.DocumentType documentType, string serial,string number)
+            ,Document.DocumentType documentType, string serial,string number,Department department)
             : this(firstName, secondName, birthDay)
         {
             if(documentType==Document.DocumentType.Passport)
                 this.EmployeeDocument = new Passport(serial, number);
+            this.Department = department;
         }
 
         public override string ToString()
         {
             return $"{FirstName} {SecondName} {this.GetType().Name}";
         }
+        public void ChangeDepartment(Department newDepartment) => this.Department = newDepartment;
     }
 }

@@ -10,7 +10,7 @@ namespace EmployeeCard.DataBaseClasses
     {
         public override Employee GetEmployee(string firstName, string secondName, DateTime birthDay, Document.DocumentType documentType, string serial, string number)
         {
-            return new Programmer(firstName,secondName,birthDay,documentType,serial,number);
+            return new Programmer(firstName,secondName,birthDay,documentType,serial,number,new Department("dsf"));
         }
     }
 }
