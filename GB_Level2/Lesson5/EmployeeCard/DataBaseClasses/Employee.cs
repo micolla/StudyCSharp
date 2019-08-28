@@ -28,5 +28,10 @@ namespace EmployeeCard.DataBaseClasses
             if(documentType==Document.DocumentType.Passport)
                 this.EmployeeDocument = new Passport(serial, number);
         }
+
+        public override string ToString()
+        {
+            return $"{FirstName} {SecondName} {this.GetType().Name}";
+        }
     }
 }
