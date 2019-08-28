@@ -8,6 +8,11 @@ namespace EmployeeCard.DataBaseClasses
 {
     abstract class Document
     {
+        public enum DocumentType
+        {
+            Passport
+            ,DriverLicense
+        }
         public string Serial { get; private set; }
         public string Number { get; private set; }
         public Document(string serial,string number)

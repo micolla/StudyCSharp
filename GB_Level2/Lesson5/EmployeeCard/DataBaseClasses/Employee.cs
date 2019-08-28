@@ -21,8 +21,12 @@ namespace EmployeeCard.DataBaseClasses
         public Employee(string firstName, string secondName, DateTime birthDay, Document employeeDocument)
             : this(firstName, secondName, birthDay)
             => this.EmployeeDocument = employeeDocument;
-        public Employee(string firstName, string secondName, DateTime birthDay, string serial,string number)
+        public Employee(string firstName, string secondName, DateTime birthDay
+            ,Document.DocumentType documentType, string serial,string number)
             : this(firstName, secondName, birthDay)
-            => this.EmployeeDocument = new Document(serial, number);
+        {
+            if(documentType==Document.DocumentType.Passport)
+                this.EmployeeDocument = new Passport(serial, number);
+        }
     }
 }

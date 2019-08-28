@@ -63,9 +63,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataBaseClasses\AbstractEmployeeFactoryMethod.cs" />
     <Compile Include="DataBaseClasses\Department.cs" />
     <Compile Include="DataBaseClasses\Document.cs" />
     <Compile Include="DataBaseClasses\Employee.cs" />
+    <Compile Include="DataBaseClasses\Passport.cs" />
+    <Compile Include="DataBaseClasses\Programmer.cs" />
+    <Compile Include="DataBaseClasses\ProgrammerFactoyMethod.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

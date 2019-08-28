@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <ListBox Margin="10" Name="lbEmployee" SelectionMode="Single" 
+                 VerticalAlignment="Top" Height="250">
+            <ListBoxItem Content="ListBoxItem"/>
+            <ListBoxItem Content="dfdsfds"/>
+        </ListBox>
     </Grid>
 </Window>
