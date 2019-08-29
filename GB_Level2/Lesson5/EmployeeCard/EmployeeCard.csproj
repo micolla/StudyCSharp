@@ -76,7 +76,6 @@
     <Compile Include="DataBaseClasses\Document.cs" />
     <Compile Include="DataBaseClasses\Employee.cs" />
     <Compile Include="DataBaseClasses\Organisation.cs" />
-    <Compile Include="DataBaseClasses\Passport.cs" />
     <Compile Include="DataBaseClasses\Programmer.cs" />
     <Compile Include="DataBaseClasses\ProgrammerFactoyMethod.cs" />
     <Compile Include="DepartmentWindow.xaml.cs">

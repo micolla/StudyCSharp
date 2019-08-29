@@ -18,17 +18,30 @@ namespace EmployeeCard.DataBaseClasses
             Departments = new ObservableCollection<Department>();
             Employees = new ObservableCollection<Employee>();
         }
-        public void AddDeparment(Department department)
+        public bool AddDeparment(Department department)
         {
-            if(( from d in Departments
-                       where d == department
-                       select d).Count()==0)
+            if ((from d in Departments
+                 where d == department
+                 select d).Count() == 0)
+            {
                 this.Departments.Add(department);
+                return true;
+            }
+            else
+                return false;
         }
 
-        public void AddEmployee(Employee employee)
+        public bool AddEmployee(Employee employee)
         {
-            this.Employees.Add(employee);
+            if ((from e in Employees
+                 where e == employee
+                 select e).Count() == 0)
+            {
+                this.Employees.Add(employee);
+                return true;
+            }
+            else
+                return false;
         }
 
         public override string ToString()

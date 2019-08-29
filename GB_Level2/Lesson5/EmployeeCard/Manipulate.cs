@@ -34,22 +34,24 @@ namespace EmployeeCard
             org = new Organisation("MyCompany");
             org.AddDeparment(new Department("Main Department"));
             org.AddEmployee(
-                new Programmer("Nikolay", "Dontsov", new DateTime(1990, 12, 22), new Passport("3243", "34234"), org.Departments[0])
+                new Programmer("Nikolay", "Dontsov", new DateTime(1990, 12, 22)
+                , new Document("3243", "34234",Document.DocumentType.Passport), org.Departments[0])
                 );
             org.AddDeparment(new Department("Second Department"));
             org.AddEmployee(
-                new Programmer("Vasilyi", "Pupkin", new DateTime(1920, 12, 22), new Passport("3243", "34234"), org.Departments[1])
+                new Programmer("Vasilyi", "Pupkin", new DateTime(1920, 12, 22)
+                , new Document("3243", "34234", Document.DocumentType.DriverLicense), org.Departments[1])
                 );
         }
         private static void BtnEditEmployee_Click(object sender, RoutedEventArgs e)
         {
             EmployeeWindow employeeWindow = new EmployeeWindow();
-            employeeWindow.tbFirstName.IsEnabled = false;
+            /*employeeWindow.tbFirstName.IsEnabled = false;
             employeeWindow.tbSecondName.IsEnabled = false;
             employeeWindow.tbSerial.IsEnabled = false;
             employeeWindow.tbNumber.IsEnabled = false;
             employeeWindow.dpBirthDay.IsEnabled = false;
-            employeeWindow.cbDocumentType.IsEnabled = false;
+            employeeWindow.cbDocumentType.IsEnabled = false;*/
             Employee curEmp = mainWindow.lbEmployees.SelectedItem as Employee;
             employeeWindow.tbFirstName.Text = curEmp.FirstName;
             employeeWindow.tbSecondName.Text = curEmp.SecondName;
@@ -66,11 +68,15 @@ namespace EmployeeCard
             {
                 if (!String.IsNullOrEmpty(employeeWindow.tbFirstName.Text) && !String.IsNullOrEmpty(employeeWindow.tbSecondName.Text)
                 && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
-                && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text)
-                && (employeeWindow.cbDepartment.SelectedItem as Department)!=curEmp.Department)
+                && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
                 {
                     var r = curEmp.Department;
-                    curEmp.ChangeDepartment(employeeWindow.cbDepartment.SelectedItem as Department);
+                    curEmp.ChangePersonalInfo(employeeWindow.tbFirstName.Text
+                      , employeeWindow.tbSecondName.Text
+                      , employeeWindow.dpBirthDay.SelectedDate.Value
+                      , (Document.DocumentType)employeeWindow.cbDocumentType.SelectedItem
+                      , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
+                      , (employeeWindow.cbDepartment.SelectedItem as Department));
                     mainWindow.lbEmployees.ItemsSource = org.GetEmployees(r);
                     employeeWindow.Close();
                 }
@@ -86,24 +92,27 @@ namespace EmployeeCard
             EmployeeWindow employeeWindow = new EmployeeWindow();
             employeeWindow.btnCancel.Click += (o, h) => employeeWindow.Close();
             employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentType));
-            employeeWindow.cbDocumentType.ItemsSource = org.Departments;
+            employeeWindow.cbDepartment.ItemsSource = org.Departments;
             employeeWindow.btnAddEmployee.Click += (o, h) =>
             {
                 if (!String.IsNullOrEmpty(employeeWindow.tbFirstName.Text) && !String.IsNullOrEmpty(employeeWindow.tbSecondName.Text)
                 && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
                 && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
                 {
-                    org.AddEmployee(new Programmer(
+                    if (org.AddEmployee(new Programmer(
                       employeeWindow.tbFirstName.Text
                       , employeeWindow.tbSecondName.Text
                       , employeeWindow.dpBirthDay.SelectedDate.Value
                       , (Document.DocumentType)employeeWindow.cbDocumentType.SelectedItem
-                      , employeeWindow.tbSerial.Text, employeeWindow.tbSecondName.Text
-                      , (mainWindow.lbDepartments.SelectedItem as Department)
-                      )
-                      );
-                    mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department));
-                    employeeWindow.Close();
+                      , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
+                      , (employeeWindow.cbDepartment.SelectedItem as Department)
+                      )))
+                    {
+                        mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department));
+                        employeeWindow.Close();
+                    }
+                    else
+                        MessageBox.Show("Такой сотрудник уже есть");
                 }
                 else
                     MessageBox.Show("Заполните все параметры");
@@ -118,8 +127,9 @@ namespace EmployeeCard
             departmentWindow.btnCancel.Click += (o, h) => departmentWindow.Close();
             departmentWindow.btnAddDepartment.Click += (o, h) =>
             {
-                org.AddDeparment(new Department(departmentWindow.tbDeparmentName.Text));
-                departmentWindow.Close();
+                if (org.AddDeparment(new Department(departmentWindow.tbDeparmentName.Text)))
+                    departmentWindow.Close();
+                else MessageBox.Show("Такой отдел уже есть");
             };
             departmentWindow.Owner = mainWindow;
             departmentWindow.ShowDialog();
