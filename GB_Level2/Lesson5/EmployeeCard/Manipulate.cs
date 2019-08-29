@@ -37,7 +37,15 @@ namespace EmployeeCard
 
         private static void BtnAddDepartment_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            DepartmentWindow departmentWindow = new DepartmentWindow();
+            departmentWindow.btnCancel.Click += (o, h) => departmentWindow.Close();
+            departmentWindow.btnAddDepartment.Click += (o, h) =>
+            {
+                org.AddDeparment(new Department(departmentWindow.tbDeparmentName.Text));
+                departmentWindow.Close();
+            };
+            departmentWindow.Owner = mainWindow;
+            departmentWindow.ShowDialog();
         }
 
         private static void LbDepartments_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

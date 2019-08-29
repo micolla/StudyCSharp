@@ -20,7 +20,10 @@ namespace EmployeeCard.DataBaseClasses
         }
         public void AddDeparment(Department department)
         {
-            this.Departments.Add(department);
+            if(( from d in Departments
+                       where d == department
+                       select d).Count()==0)
+                this.Departments.Add(department);
         }
 
         public void AddEmployee(Employee employee)
