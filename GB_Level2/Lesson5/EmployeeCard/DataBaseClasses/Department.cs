@@ -29,6 +29,6 @@ namespace EmployeeCard.DataBaseClasses
         }
 
         public static bool operator ==(Department d, Department d2) => d.Equals(d2);
-        public static bool operator !=(Department d, Department d2) => d.Equals(d2);
+        public static bool operator !=(Department d, Department d2) => !d.Equals(d2);
     }
 }

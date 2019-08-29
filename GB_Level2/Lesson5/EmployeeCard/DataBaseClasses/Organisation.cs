@@ -9,8 +9,8 @@ namespace EmployeeCard.DataBaseClasses
 {
     class Organisation
     {
-        public ObservableCollection<Department> Departments { get; set; }
-        public ObservableCollection<Employee> Employees { get; set; }
+        public ObservableCollection<Department> Departments { get; private set; }
+        public ObservableCollection<Employee> Employees { get; private set; }
         public string OrganisationName { get; private set; }
         public Organisation(string orgName)
         {

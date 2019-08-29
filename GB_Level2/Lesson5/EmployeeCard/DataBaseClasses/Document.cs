@@ -15,6 +15,7 @@ namespace EmployeeCard.DataBaseClasses
         }
         public string Serial { get; private set; }
         public string Number { get; private set; }
+        public abstract DocumentType documentType { get; }
         public Document(string serial,string number)
         {
             this.Number = number;

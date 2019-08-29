@@ -33,11 +33,11 @@ namespace EmployeeCard.DataBaseClasses
                 this.EmployeeDocument = new Passport(serial, number);
             this.Department = department;
         }
+        public void ChangeDepartment(Department newDepartment) => this.Department = newDepartment;
 
         public override string ToString()
         {
             return $"{FirstName} {SecondName} {this.GetType().Name}";
         }
-        public void ChangeDepartment(Department newDepartment) => this.Department = newDepartment;
     }
 }
