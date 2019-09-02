@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using EmployeeCard.DataBaseClasses;
+using System.IO;
 
 namespace EmployeeCard
 {
@@ -32,36 +33,55 @@ namespace EmployeeCard
         private static void FillOrgStructure()
         {
             org = new Organisation("MyCompany");
-            org.AddDeparment(new Department("Main Department"));
+            using (StreamReader streamReader = new StreamReader("InfoBase/departments.csv"))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    org.AddDeparment(new Department(streamReader.ReadLine()));
+                }
+            }
+            using (StreamReader streamReader = new StreamReader("InfoBase/employee.csv"))
+            {
+                string[] emp;
+                int deptId;
+                while (!streamReader.EndOfStream)
+                {
+                    emp=streamReader.ReadLine().Split(';');
+                    if (emp.Length == 7)
+                    {
+                        deptId = (from d in org.Departments where d.DepartmentName == emp[6] select d.DepartmentId).First();
+                        org.AddEmployee(new Employee(emp[0],emp[1]
+                            ,DateTime.Parse(emp[2],System.Globalization.CultureInfo.CurrentCulture)
+                            ,(Document.DocumentTypes)Enum.Parse(typeof(Document.DocumentTypes),emp[3])
+                            , emp[4], emp[5]
+                            , deptId));
+                    }
+                }
+            }
+            /*org.AddDeparment(new Department("Main Department"));
             org.AddEmployee(
                 new Programmer("Nikolay", "Dontsov", new DateTime(1990, 12, 22)
-                , new Document("3243", "34234",Document.DocumentTypes.Passport), org.Departments[0])
+                , new Document("3243", "34234",Document.DocumentTypes.Passport), org.Departments[0].DepartmentId)
                 );
             org.AddDeparment(new Department("Second Department"));
             org.AddEmployee(
                 new Programmer("Vasilyi", "Pupkin", new DateTime(1920, 12, 22)
-                , new Document("3243", "34234", Document.DocumentTypes.DriverLicense), org.Departments[1])
-                );
+                , new Document("3243", "34234", Document.DocumentTypes.DriverLicense), org.Departments[1].DepartmentId)
+                );*/
         }
         private static void BtnEditEmployee_Click(object sender, RoutedEventArgs e)
         {
             EmployeeWindow employeeWindow = new EmployeeWindow();
-            /*employeeWindow.tbFirstName.IsEnabled = false;
-            employeeWindow.tbSecondName.IsEnabled = false;
-            employeeWindow.tbSerial.IsEnabled = false;
-            employeeWindow.tbNumber.IsEnabled = false;
-            employeeWindow.dpBirthDay.IsEnabled = false;
-            employeeWindow.cbDocumentType.IsEnabled = false;*/
             Employee curEmp = mainWindow.lbEmployees.SelectedItem as Employee;
             employeeWindow.tbFirstName.Text = curEmp.FirstName;
             employeeWindow.tbSecondName.Text = curEmp.SecondName;
             employeeWindow.tbSerial.Text = curEmp.EmployeeDocument.Serial;
             employeeWindow.tbNumber.Text = curEmp.EmployeeDocument.Number;
             employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentTypes));
-            employeeWindow.cbDocumentType.SelectedItem = curEmp.EmployeeDocument.documentType;
+            employeeWindow.cbDocumentType.SelectedItem = curEmp.EmployeeDocument.DocumentType;
             employeeWindow.dpBirthDay.SelectedDate =curEmp.BirthDay;
             employeeWindow.cbDepartment.ItemsSource= org.Departments;
-            employeeWindow.cbDepartment.SelectedItem = curEmp.Departmentid;
+            employeeWindow.cbDepartment.SelectedItem = org.Departments.First(d=>d.DepartmentId == curEmp.Departmentid);
             employeeWindow.btnCancel.Click += (o, h) => employeeWindow.Close();
             employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentTypes));
             employeeWindow.btnAddEmployee.Click += (o, h) =>
@@ -70,14 +90,13 @@ namespace EmployeeCard
                 && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
                 && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
                 {
-                    var r = curEmp.Departmentid;
                     curEmp.ChangePersonalInfo(employeeWindow.tbFirstName.Text
                       , employeeWindow.tbSecondName.Text
                       , employeeWindow.dpBirthDay.SelectedDate.Value
                       , (Document.DocumentTypes)employeeWindow.cbDocumentType.SelectedItem
                       , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
-                      , (employeeWindow.cbDepartment.SelectedItem as Department));
-                    mainWindow.lbEmployees.ItemsSource = org.GetEmployees(r);
+                      , (employeeWindow.cbDepartment.SelectedItem as Department).DepartmentId);
+                    mainWindow.lbEmployees.ItemsSource = org.GetEmployees(curEmp.Departmentid);
                     employeeWindow.Close();
                 }
                 else
@@ -99,16 +118,16 @@ namespace EmployeeCard
                 && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
                 && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
                 {
-                    if (org.AddEmployee(new Programmer(
+                    if (org.AddEmployee(new Employee(
                       employeeWindow.tbFirstName.Text
                       , employeeWindow.tbSecondName.Text
                       , employeeWindow.dpBirthDay.SelectedDate.Value
                       , (Document.DocumentTypes)employeeWindow.cbDocumentType.SelectedItem
                       , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
-                      , (employeeWindow.cbDepartment.SelectedItem as Department)
+                      , (employeeWindow.cbDepartment.SelectedItem as Department).DepartmentId
                       )))
                     {
-                        mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department));
+                        mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department).DepartmentId);
                         employeeWindow.Close();
                     }
                     else
@@ -137,7 +156,7 @@ namespace EmployeeCard
 
         private static void LbDepartments_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department));
+            mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department).DepartmentId);
             mainWindow.btnAddEmployee.Visibility = Visibility.Visible;
             mainWindow.btnEditDepartment.Visibility = mainWindow.lbDepartments.SelectedItem != null ? Visibility.Visible : Visibility.Hidden;
         }

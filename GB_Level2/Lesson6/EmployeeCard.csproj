@@ -55,8 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Views\IDepartmentBaseView.cs" />
-    <Compile Include="Views\IEmployeeBaseView.cs" />
     <Page Include="Windows\DepartmentWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -79,7 +77,6 @@
     <Compile Include="DataBaseClasses\Employee.cs" />
     <Compile Include="DataBaseClasses\Organisation.cs" />
     <Compile Include="DataBaseClasses\Programmer.cs" />
-    <Compile Include="DataBaseClasses\ProgrammerFactoyMethod.cs" />
     <Compile Include="Windows\DepartmentWindow.xaml.cs">
       <DependentUpon>DepartmentWindow.xaml</DependentUpon>
     </Compile>
@@ -110,6 +107,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="InfoBase\departments.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="InfoBase\employee.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

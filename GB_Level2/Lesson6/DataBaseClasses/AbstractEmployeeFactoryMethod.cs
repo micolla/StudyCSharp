@@ -9,6 +9,6 @@ namespace EmployeeCard.DataBaseClasses
     abstract class AbstractEmployeeFactoryMethod
     {
         public abstract Employee GetEmployee(string firstName, string secondName, DateTime birthDay
-            , Document.DocumentType documentType, string serial, string number);
+            , Document.DocumentTypes documentType, string serial, string number);
     }
 }

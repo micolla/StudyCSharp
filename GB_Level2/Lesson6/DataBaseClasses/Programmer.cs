@@ -8,14 +8,14 @@ namespace EmployeeCard.DataBaseClasses
 {
     class Programmer : Employee
     {
-        public Programmer(string firstName, string secondName, DateTime birthDay, Document employeeDocument,Department department) 
-            : base(firstName, secondName, birthDay, employeeDocument, department)
+        public Programmer(string firstName, string secondName, DateTime birthDay, Document employeeDocument,int departmentId) 
+            : base(firstName, secondName, birthDay, employeeDocument, departmentId)
         {
         }
 
-        public Programmer(string firstName, string secondName, DateTime birthDay, Document.DocumentType documentType
-            , string serial, string number, Department department) 
-            : base(firstName, secondName, birthDay, documentType, serial, number,department)
+        public Programmer(string firstName, string secondName, DateTime birthDay, Document.DocumentTypes documentType
+            , string serial, string number, int departmentId) 
+            : base(firstName, secondName, birthDay, documentType, serial, number, departmentId)
         {
         }
     }

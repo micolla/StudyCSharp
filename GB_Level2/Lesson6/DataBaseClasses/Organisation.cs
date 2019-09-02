@@ -48,10 +48,10 @@ namespace EmployeeCard.DataBaseClasses
         {
             return this.OrganisationName;
         }
-        public ObservableCollection<Employee> GetEmployees(Department department)
+        public ObservableCollection<Employee> GetEmployees(int departmentId)
         {
             return new ObservableCollection<Employee>(from e in Employees
-                                                      where e.Departmentid == department
+                                                      where e.Departmentid == departmentId
                                                       select e);
         }
     }

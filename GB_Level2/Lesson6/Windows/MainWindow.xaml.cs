@@ -18,16 +18,11 @@ namespace EmployeeCard
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window,Views.IDepartmentBaseView,Views.IEmployeeBaseView
+    public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
         }
-
-        public string FirstName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string SecondName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string DepartmentName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int DepartmentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }
