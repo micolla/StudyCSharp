@@ -23,5 +23,9 @@ namespace EmployeeCard
         {
             InitializeComponent();
         }
+        public DepartmentWindow(string departmentName):this()
+        {
+            tbDeparmentName.Text = departmentName;
+        }
     }
 }

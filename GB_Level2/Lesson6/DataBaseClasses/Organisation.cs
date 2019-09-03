@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,10 +22,23 @@ namespace EmployeeCard.DataBaseClasses
         public bool AddDeparment(Department department)
         {
             if ((from d in Departments
-                 where d == department
+                 where d.DepartmentName == department.DepartmentName
                  select d).Count() == 0)
             {
                 this.Departments.Add(department);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ChangeDepartmentName(int deptId,string newName)
+        {
+            if ((from d in Departments
+                 where d.DepartmentName == newName
+                 select d).Count() == 0)
+            {
+                this.Departments.Where((d)=>d.DepartmentId==deptId).First().DepartmentName=newName;
                 return true;
             }
             else
