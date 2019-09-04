@@ -20,6 +20,7 @@ namespace EmployeeCard
         private static SqlDataAdapter sqlDepartmentAdapter;
         private static DataTable deptDatatTable;
         private static DataTable empDatatTable;
+        private static SqlConnection sqlConnection;
         public static void Init(MainWindow window)
         {
             FillOrgStructure();
@@ -66,26 +67,28 @@ namespace EmployeeCard
         {
             org = new Organisation("MyCompany");
             string connectionString = ConfigurationManager.ConnectionStrings["EmployeeCardConnectionString"].ConnectionString;
-            SqlConnection sqlConnection;
-            using (sqlConnection = new SqlConnection(connectionString)) {
-                sqlDepartmentAdapter = new SqlDataAdapter("select * from departments", sqlConnection);
-                SqlCommand updateCommand = new SqlCommand("update Departments set DepartmentName=@deptName,ParentDeptId=@parentDepId where DeptId=@deptid;",new SqlConnection(connectionString));
-                updateCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
-                updateCommand.Parameters.Add("@parentDepId", SqlDbType.Int);
-                updateCommand.Parameters.Add("@deptid", SqlDbType.Int);
-                sqlDepartmentAdapter.UpdateCommand = updateCommand;
-                SqlCommand insertCommand = new SqlCommand("Insert into Departments(DepartmentName,ParentDeptId)values(@deptName,@parentDepId);",new SqlConnection(connectionString));
-                insertCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
-                insertCommand.Parameters.Add("@parentDepId", SqlDbType.Int);
-                sqlDepartmentAdapter.InsertCommand = insertCommand;
-                deptDatatTable = new DataTable();
-                sqlDepartmentAdapter.Fill(deptDatatTable);
-                for (int i = 0; i < deptDatatTable.Rows.Count; i++)
-                {
-                    org.AddDeparment(new Department((int)deptDatatTable.Rows[i]["DeptId"],(string)deptDatatTable.Rows[i]["DepartmentName"]));
-                }
-            };
 
+            sqlConnection = new SqlConnection(connectionString);
+            sqlDepartmentAdapter = new SqlDataAdapter("select * from departments", sqlConnection);
+            SqlCommand updateCommand = new SqlCommand("update Departments set DepartmentName=@deptName,ParentDeptId=@parentDepId where DeptId=@deptid;", sqlConnection);
+            updateCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
+            updateCommand.Parameters.Add("@parentDepId", SqlDbType.Int,0, "ParentDeptId");
+            updateCommand.Parameters.Add("@deptid", SqlDbType.Int, 0, "deptid");
+            sqlDepartmentAdapter.UpdateCommand = updateCommand;
+            SqlCommand insertCommand = new SqlCommand("Insert into Departments(DepartmentName,ParentDeptId)values(@deptName,@parentDepId); SET @ID = @@IDENTITY;", sqlConnection);
+            insertCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
+            insertCommand.Parameters.Add("@parentDepId", SqlDbType.Int,0, "ParentDeptId");
+            insertCommand.Parameters.Add("@ID", SqlDbType.Int, 0, "ID");
+            insertCommand.Parameters["@ID"].Direction = ParameterDirection.Output;
+            sqlDepartmentAdapter.InsertCommand = insertCommand;
+            sqlDepartmentAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.OutputParameters;
+            deptDatatTable = new DataTable();
+            sqlDepartmentAdapter.Fill(deptDatatTable);
+            for (int i = 0; i < deptDatatTable.Rows.Count; i++)
+            {
+                org.AddDeparment(new Department((int)deptDatatTable.Rows[i]["DeptId"],(string)deptDatatTable.Rows[i]["DepartmentName"]));
+            }
+            sqlConnection.Close();
         }
 
         /*private static void FillOrgStructure()
@@ -216,7 +219,8 @@ namespace EmployeeCard
                 newRow["ParentDeptId"] = DBNull.Value;
                 deptDatatTable.Rows.Add(newRow);
                 sqlDepartmentAdapter.Update(deptDatatTable);
-                if (org.AddDeparment(new Department((int)newRow["DeptId"], (string)newRow["DepartmentName"])))
+                sqlDepartmentAdapter.Fill(deptDatatTable);
+                if (org.AddDeparment(new Department((int)newRow["DeptId"], "dfs")))
                     departmentWindow.Close();
                 else MessageBox.Show("Такой отдел уже есть");
             };
@@ -240,6 +244,8 @@ namespace EmployeeCard
             };
             departmentWindow.Owner = mainWindow;
             departmentWindow.ShowDialog();
+            deptDatatTable.Rows[0]["DepartmentName"] = "--1111";
+            sqlDepartmentAdapter.Update(deptDatatTable);
         }
 
         /// <summary>
