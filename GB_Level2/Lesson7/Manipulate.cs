@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using EmployeeCard.DataBaseClasses;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
@@ -15,9 +14,9 @@ namespace EmployeeCard
 {
     static class Manipulate
     {
-        static Organisation org;
         static MainWindow mainWindow;
         private static SqlDataAdapter sqlDepartmentAdapter;
+        private static SqlDataAdapter sqlEmployeeAdapter;
         private static DataTable deptDatatTable;
         private static DataTable empDatatTable;
         private static SqlConnection sqlConnection;
@@ -25,39 +24,14 @@ namespace EmployeeCard
         {
             FillOrgStructure();
             mainWindow = window;
-            mainWindow.lbDepartments.ItemsSource = org.Departments;
+            mainWindow.lbDepartments.ItemsSource = deptDatatTable.DefaultView;
+            mainWindow.lbEmployees.ItemsSource = empDatatTable.DefaultView;
             mainWindow.lbDepartments.SelectionChanged += LbDepartments_SelectionChanged;
             mainWindow.lbEmployees.SelectionChanged += LbEmployees_SelectionChanged;
             mainWindow.btnAddDepartment.Click += BtnAddDepartment_Click;
             mainWindow.btnAddEmployee.Click += BtnAddEmployee_Click;
             mainWindow.btnEditEmployee.Click += BtnEditEmployee_Click;
             mainWindow.btnEditDepartment.Click += BtnEditDepartment_Click;
-            mainWindow.Closing += MainWindow_Closing;
-        }
-        /// <summary>
-        /// Сохранение
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // Нужно переделать на долив изменений
-            using (StreamWriter streamWriter = new StreamWriter("InfoBase/departments.csv"))
-            {
-                foreach (Department department in org.Departments)
-                {
-                    streamWriter.WriteLine($"{department.DepartmentId};{department.DepartmentName}");
-                }
-            }
-            using (StreamWriter streamWriter = new StreamWriter("InfoBase/employee.csv"))
-            {
-                foreach (Employee employee in org.Employees)
-                {
-                    streamWriter.WriteLine(
-                        $"{employee.FirstName};{employee.SecondName};{employee.BirthDay.ToString("dd.mm.yyyy")};{employee.EmployeeDocument.DocumentType};"+
-                        $"{ employee.EmployeeDocument.Serial};{employee.EmployeeDocument.Number}");
-                }
-            }
         }
 
         /// <summary>
@@ -65,7 +39,6 @@ namespace EmployeeCard
         /// </summary>
         private static void FillOrgStructure()
         {
-            org = new Organisation("MyCompany");
             string connectionString = ConfigurationManager.ConnectionStrings["EmployeeCardConnectionString"].ConnectionString;
 
             sqlConnection = new SqlConnection(connectionString);
@@ -78,48 +51,38 @@ namespace EmployeeCard
             SqlCommand insertCommand = new SqlCommand("Insert into Departments(DepartmentName,ParentDeptId)values(@deptName,@parentDepId); SET @ID = @@IDENTITY;", sqlConnection);
             insertCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
             insertCommand.Parameters.Add("@parentDepId", SqlDbType.Int,0, "ParentDeptId");
-            insertCommand.Parameters.Add("@ID", SqlDbType.Int, 0, "ID");
+            insertCommand.Parameters.Add("@ID", SqlDbType.Int, 0, "deptID");
             insertCommand.Parameters["@ID"].Direction = ParameterDirection.Output;
+            insertCommand.Parameters["@ID"].SourceVersion = DataRowVersion.Current;
             sqlDepartmentAdapter.InsertCommand = insertCommand;
-            sqlDepartmentAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.OutputParameters;
+            //sqlDepartmentAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.OutputParameters;
             deptDatatTable = new DataTable();
             sqlDepartmentAdapter.Fill(deptDatatTable);
-            for (int i = 0; i < deptDatatTable.Rows.Count; i++)
-            {
-                org.AddDeparment(new Department((int)deptDatatTable.Rows[i]["DeptId"],(string)deptDatatTable.Rows[i]["DepartmentName"]));
-            }
-            sqlConnection.Close();
+
+            sqlEmployeeAdapter = new SqlDataAdapter("select e.*, d.DepartmentName "
+                                                +"from Employees e "
+                                                +"join Departments d on d.DeptId = e.DeptId "
+                                                +"where e.DeptId=@Deptid"
+                                    , sqlConnection);
+            sqlEmployeeAdapter.SelectCommand.Parameters.Add("@deptid", SqlDbType.Int, 0, "deptid");
+            sqlEmployeeAdapter.UpdateCommand = new SqlCommand("update Employees set FirstName=@Firstname,SecondName=@Secondname,BirthDay=@Birthday,DeptId=@Deptid where EmplId=@emplid",sqlConnection);
+            sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Firstname", SqlDbType.NVarChar, 50, "Firstname");
+            sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Secondname", SqlDbType.NVarChar, 50, "Secondname");
+            sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Birthday", SqlDbType.Date, 0, "Birthday");
+            sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Deptid", SqlDbType.Int, 0, "Deptid");
+            sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@emplid", SqlDbType.Int, 0, "emplid");
+            sqlEmployeeAdapter.InsertCommand = new SqlCommand("insert into Employees(FirstName,SecondName,BirthDay,DeptId) values(@Firstname,@Secondname,@Birthday,@Deptid)",sqlConnection);
+            sqlEmployeeAdapter.InsertCommand.Parameters.Add("@Firstname", SqlDbType.NVarChar, 60, "Firstname");
+            sqlEmployeeAdapter.InsertCommand.Parameters.Add("@Secondname", SqlDbType.NVarChar, 60, "Secondname");
+            sqlEmployeeAdapter.InsertCommand.Parameters.Add("@Birthday", SqlDbType.Date, 0, "Birthday");
+            sqlEmployeeAdapter.InsertCommand.Parameters.Add("@Deptid", SqlDbType.Int, 0, "Deptid");
+            sqlEmployeeAdapter.InsertCommand.Parameters.Add("@emplid", SqlDbType.Int, 0, "emplid");
+            sqlEmployeeAdapter.InsertCommand.Parameters["@emplid"].Direction = ParameterDirection.Output;
+            sqlEmployeeAdapter.InsertCommand.Parameters["@emplid"].SourceVersion = DataRowVersion.Current;
+            empDatatTable = new DataTable();
+
         }
 
-        /*private static void FillOrgStructure()
-        {
-            org = new Organisation("MyCompany");
-            using (StreamReader streamReader = new StreamReader("InfoBase/departments.csv"))
-            {
-                while (!streamReader.EndOfStream)
-                {
-                    org.AddDeparment(new Department(streamReader.ReadLine()));
-                }
-            }
-            using (StreamReader streamReader = new StreamReader("InfoBase/employee.csv"))
-            {
-                string[] emp;
-                int deptId;
-                while (!streamReader.EndOfStream)
-                {
-                    emp=streamReader.ReadLine().Split(';');
-                    if (emp.Length == 7)
-                    {
-                        deptId = (from d in org.Departments where d.DepartmentName == emp[6] select d.DepartmentId).First();
-                        org.AddEmployee(new Employee(emp[0],emp[1]
-                            ,DateTime.Parse(emp[2],System.Globalization.CultureInfo.CurrentCulture)
-                            ,(Document.DocumentTypes)Enum.Parse(typeof(Document.DocumentTypes),emp[3])
-                            , emp[4], emp[5]
-                            , deptId));
-                    }
-                }
-            }
-        }*/
         /// <summary>
         /// Редактирование сотрудника
         /// </summary>
@@ -127,42 +90,19 @@ namespace EmployeeCard
         /// <param name="e"></param>
         private static void BtnEditEmployee_Click(object sender, RoutedEventArgs e)
         {
-            EmployeeWindow employeeWindow = new EmployeeWindow();
-            Employee curEmp = mainWindow.lbEmployees.SelectedItem as Employee;
-            employeeWindow.tbFirstName.Text = curEmp.FirstName;
-            employeeWindow.tbSecondName.Text = curEmp.SecondName;
-            employeeWindow.tbSerial.Text = curEmp.EmployeeDocument.Serial;
-            employeeWindow.tbNumber.Text = curEmp.EmployeeDocument.Number;
-            employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentTypes));
-            employeeWindow.cbDocumentType.SelectedItem = curEmp.EmployeeDocument.DocumentType;
-            employeeWindow.dpBirthDay.SelectedDate =curEmp.BirthDay;
-            employeeWindow.cbDepartment.ItemsSource= org.Departments;
-            employeeWindow.cbDepartment.SelectedItem = org.Departments.First(d=>d.DepartmentId == curEmp.Departmentid);
-            employeeWindow.btnCancel.Click += (o, h) => employeeWindow.Close();
-            employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentTypes));
-            employeeWindow.btnAddEmployee.Click += (o, h) =>
-            {
-                int currentDeptId = curEmp.Departmentid;
-                if (!String.IsNullOrEmpty(employeeWindow.tbFirstName.Text) && !String.IsNullOrEmpty(employeeWindow.tbSecondName.Text)
-                && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
-                && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
-                {
-                    curEmp.ChangePersonalInfo(employeeWindow.tbFirstName.Text
-                      , employeeWindow.tbSecondName.Text
-                      , employeeWindow.dpBirthDay.SelectedDate.Value
-                      , (Document.DocumentTypes)employeeWindow.cbDocumentType.SelectedItem
-                      , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
-                      , (employeeWindow.cbDepartment.SelectedItem as Department).DepartmentId);
-                    // Как бы это переделать
-                    if (currentDeptId!= curEmp.Departmentid)
-                        mainWindow.lbEmployees.ItemsSource = org.GetEmployees(currentDeptId);
-                    employeeWindow.Close();
-                }
-                else
-                    MessageBox.Show("Заполните все параметры");
-            };
+            DataRowView newRow = (DataRowView)mainWindow.lbEmployees.SelectedItem;
+            EmployeeWindow employeeWindow = new EmployeeWindow(newRow.Row,deptDatatTable);
             employeeWindow.Owner = mainWindow;
+            newRow.BeginEdit();
             employeeWindow.ShowDialog();
+            if (employeeWindow.DialogResult.HasValue && employeeWindow.DialogResult.Value)
+            {
+                newRow.EndEdit();
+                empDatatTable.Rows.Add(newRow);
+                sqlEmployeeAdapter.Update(empDatatTable);
+            }
+            else
+                newRow.CancelEdit();
         }
         /// <summary>
         /// Добавить сотрудника
@@ -171,36 +111,15 @@ namespace EmployeeCard
         /// <param name="e"></param>
         private static void BtnAddEmployee_Click(object sender, RoutedEventArgs e)
         {
-            EmployeeWindow employeeWindow = new EmployeeWindow();
-            employeeWindow.btnCancel.Click += (o, h) => employeeWindow.Close();
-            employeeWindow.cbDocumentType.ItemsSource = Enum.GetValues(typeof(Document.DocumentTypes));
-            employeeWindow.cbDepartment.ItemsSource = org.Departments;
-            employeeWindow.btnAddEmployee.Click += (o, h) =>
-            {
-                if (!String.IsNullOrEmpty(employeeWindow.tbFirstName.Text) && !String.IsNullOrEmpty(employeeWindow.tbSecondName.Text)
-                && employeeWindow.dpBirthDay.SelectedDate.HasValue && employeeWindow.cbDocumentType.SelectedItem != null
-                && !String.IsNullOrEmpty(employeeWindow.tbSerial.Text) && !String.IsNullOrEmpty(employeeWindow.tbNumber.Text))
-                {
-                    if (org.AddEmployee(new Employee(
-                      employeeWindow.tbFirstName.Text
-                      , employeeWindow.tbSecondName.Text
-                      , employeeWindow.dpBirthDay.SelectedDate.Value
-                      , (Document.DocumentTypes)employeeWindow.cbDocumentType.SelectedItem
-                      , employeeWindow.tbSerial.Text, employeeWindow.tbNumber.Text
-                      , (employeeWindow.cbDepartment.SelectedItem as Department).DepartmentId
-                      )))
-                    {
-                        mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department).DepartmentId);
-                        employeeWindow.Close();
-                    }
-                    else
-                        MessageBox.Show("Такой сотрудник уже есть");
-                }
-                else
-                    MessageBox.Show("Заполните все параметры");
-            };
+            DataRow newRow = empDatatTable.NewRow();
+            EmployeeWindow employeeWindow = new EmployeeWindow(newRow, deptDatatTable);
             employeeWindow.Owner = mainWindow;
             employeeWindow.ShowDialog();
+            if (employeeWindow.DialogResult.HasValue && employeeWindow.DialogResult.Value)
+            {
+                empDatatTable.Rows.Add(newRow);
+                sqlEmployeeAdapter.Update(empDatatTable);
+            }
         }
         /// <summary>
         /// Добавить отдел
@@ -209,24 +128,17 @@ namespace EmployeeCard
         /// <param name="e"></param>
         private static void BtnAddDepartment_Click(object sender, RoutedEventArgs e)
         {
-            DepartmentWindow departmentWindow = new DepartmentWindow();
-            departmentWindow.btnCancel.Click += (o, h) => departmentWindow.Close();
-            departmentWindow.btnAddDepartment.Click += (o, h) =>
-            {
-                DataRow newRow = deptDatatTable.NewRow();
-                newRow["DepartmentName"] = departmentWindow.tbDeparmentName.Text;
-                newRow["DeptId"] = DBNull.Value;
-                newRow["ParentDeptId"] = DBNull.Value;
-                deptDatatTable.Rows.Add(newRow);
-                sqlDepartmentAdapter.Update(deptDatatTable);
-                sqlDepartmentAdapter.Fill(deptDatatTable);
-                if (org.AddDeparment(new Department((int)newRow["DeptId"], "dfs")))
-                    departmentWindow.Close();
-                else MessageBox.Show("Такой отдел уже есть");
-            };
+            DataRow newRow = deptDatatTable.NewRow();
+            DepartmentWindow departmentWindow = new DepartmentWindow(newRow);
             departmentWindow.Owner = mainWindow;
             departmentWindow.ShowDialog();
+            if (departmentWindow.DialogResult.HasValue && departmentWindow.DialogResult.Value)
+            {
+                deptDatatTable.Rows.Add(newRow);
+                sqlDepartmentAdapter.Update(deptDatatTable);
+            }
         }
+
         /// <summary>
         /// Редактировать отдел
         /// </summary>
@@ -234,18 +146,18 @@ namespace EmployeeCard
         /// <param name="e"></param>
         private static void BtnEditDepartment_Click(object sender, RoutedEventArgs e)
         {
-            DepartmentWindow departmentWindow = new DepartmentWindow((mainWindow.lbDepartments.SelectedItem as Department).DepartmentName);
-            departmentWindow.btnCancel.Click += (o, h) => departmentWindow.Close();
-            departmentWindow.btnAddDepartment.Click += (o, h) =>
-            {
-                if (org.ChangeDepartmentName((mainWindow.lbDepartments.SelectedItem as Department).DepartmentId, departmentWindow.tbDeparmentName.Text))
-                    departmentWindow.Close();
-                else MessageBox.Show("Такой отдел уже есть");
-            };
+            DataRowView newRow = (DataRowView)mainWindow.lbDepartments.SelectedItem;
+            DepartmentWindow departmentWindow = new DepartmentWindow(newRow.Row);
+            newRow.BeginEdit();
             departmentWindow.Owner = mainWindow;
             departmentWindow.ShowDialog();
-            deptDatatTable.Rows[0]["DepartmentName"] = "--1111";
-            sqlDepartmentAdapter.Update(deptDatatTable);
+            if (departmentWindow.DialogResult.HasValue && departmentWindow.DialogResult.Value)
+            {
+                newRow.EndEdit();
+                sqlDepartmentAdapter.Update(deptDatatTable);
+            }
+            else
+                newRow.CancelEdit();
         }
 
         /// <summary>
@@ -255,7 +167,11 @@ namespace EmployeeCard
         /// <param name="e"></param>
         private static void LbDepartments_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            mainWindow.lbEmployees.ItemsSource = org.GetEmployees((mainWindow.lbDepartments.SelectedItem as Department).DepartmentId);
+            sqlEmployeeAdapter.SelectCommand.Parameters["@deptid"].Value = (mainWindow.lbDepartments.SelectedItem as DataRowView).Row["deptId"];
+            empDatatTable = null;
+            empDatatTable = new DataTable();
+            sqlEmployeeAdapter.Fill(empDatatTable);
+            mainWindow.lbEmployees.ItemsSource = empDatatTable.DefaultView;
             mainWindow.btnAddEmployee.IsEnabled = true;
             mainWindow.btnEditDepartment.IsEnabled = mainWindow.lbDepartments.SelectedItem != null ? true : false;
         }
