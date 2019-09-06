@@ -24,8 +24,8 @@ namespace EmployeeCard
         {
             FillOrgStructure();
             mainWindow = window;
-            mainWindow.lbDepartments.ItemsSource = deptDatatTable.DefaultView;
-            mainWindow.lbEmployees.ItemsSource = empDatatTable.DefaultView;
+            mainWindow.lbDepartments.DataContext = deptDatatTable.DefaultView;
+            mainWindow.lbEmployees.DataContext = empDatatTable.DefaultView;
             mainWindow.lbDepartments.SelectionChanged += LbDepartments_SelectionChanged;
             mainWindow.lbEmployees.SelectionChanged += LbEmployees_SelectionChanged;
             mainWindow.btnAddDepartment.Click += BtnAddDepartment_Click;
@@ -44,7 +44,8 @@ namespace EmployeeCard
             sqlConnection = new SqlConnection(connectionString);
             sqlDepartmentAdapter = new SqlDataAdapter("select * from departments", sqlConnection);
             SqlCommand updateCommand = new SqlCommand("update Departments set DepartmentName=@deptName,ParentDeptId=@parentDepId where DeptId=@deptid;", sqlConnection);
-            updateCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
+            SqlCommandBuilder scb = new SqlCommandBuilder(sqlDepartmentAdapter);
+            /*updateCommand.Parameters.Add("@deptName", SqlDbType.VarChar,255, "DepartmentName");
             updateCommand.Parameters.Add("@parentDepId", SqlDbType.Int,0, "ParentDeptId");
             updateCommand.Parameters.Add("@deptid", SqlDbType.Int, 0, "deptid");
             sqlDepartmentAdapter.UpdateCommand = updateCommand;
@@ -54,7 +55,7 @@ namespace EmployeeCard
             insertCommand.Parameters.Add("@ID", SqlDbType.Int, 0, "deptID");
             insertCommand.Parameters["@ID"].Direction = ParameterDirection.Output;
             insertCommand.Parameters["@ID"].SourceVersion = DataRowVersion.Current;
-            sqlDepartmentAdapter.InsertCommand = insertCommand;
+            sqlDepartmentAdapter.InsertCommand = insertCommand;*/
             //sqlDepartmentAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.OutputParameters;
             deptDatatTable = new DataTable();
             sqlDepartmentAdapter.Fill(deptDatatTable);
@@ -65,6 +66,7 @@ namespace EmployeeCard
                                                 +"where e.DeptId=@Deptid"
                                     , sqlConnection);
             sqlEmployeeAdapter.SelectCommand.Parameters.Add("@deptid", SqlDbType.Int, 0, "deptid");
+            sqlEmployeeAdapter.SelectCommand.Parameters["@deptid"].Value = DBNull.Value;
             sqlEmployeeAdapter.UpdateCommand = new SqlCommand("update Employees set FirstName=@Firstname,SecondName=@Secondname,BirthDay=@Birthday,DeptId=@Deptid where EmplId=@emplid",sqlConnection);
             sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Firstname", SqlDbType.NVarChar, 50, "Firstname");
             sqlEmployeeAdapter.UpdateCommand.Parameters.Add("@Secondname", SqlDbType.NVarChar, 50, "Secondname");
@@ -80,6 +82,7 @@ namespace EmployeeCard
             sqlEmployeeAdapter.InsertCommand.Parameters["@emplid"].Direction = ParameterDirection.Output;
             sqlEmployeeAdapter.InsertCommand.Parameters["@emplid"].SourceVersion = DataRowVersion.Current;
             empDatatTable = new DataTable();
+            sqlEmployeeAdapter.Fill(empDatatTable);
 
         }
 
@@ -168,10 +171,12 @@ namespace EmployeeCard
         private static void LbDepartments_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             sqlEmployeeAdapter.SelectCommand.Parameters["@deptid"].Value = (mainWindow.lbDepartments.SelectedItem as DataRowView).Row["deptId"];
+            //Без этого данные в ListView остаются и постоянно увеличиваются при считывании в empDataable
             empDatatTable = null;
             empDatatTable = new DataTable();
             sqlEmployeeAdapter.Fill(empDatatTable);
             mainWindow.lbEmployees.ItemsSource = empDatatTable.DefaultView;
+            //Конец непонятного блока
             mainWindow.btnAddEmployee.IsEnabled = true;
             mainWindow.btnEditDepartment.IsEnabled = mainWindow.lbDepartments.SelectedItem != null ? true : false;
         }
