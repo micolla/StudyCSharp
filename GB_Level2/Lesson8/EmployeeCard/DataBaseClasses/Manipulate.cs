@@ -111,12 +111,12 @@ namespace WebApiEmployeesDB.Models
                     {
                         sqlAdd = $"Update Departments set DepartmentName=@DepartmentName where deptId=@deptId";
                         command.Parameters.Add("@deptId", SqlDbType.Int, 0, "Deptid");
-                        command.Parameters["@deptId"].Value = department.DepartmentId;
+                        command.Parameters["deptId"].Value = department.DepartmentId;
                     }
                     if (sqlAdd != String.Empty)
                     {
-                        command.Parameters.Add("@DepartmentName", SqlDbType.NVarChar, 255, "DepartmentName");
-                        command.Parameters["@DepartmentName"].Value = department.DepartmentName;
+                        command.Parameters.Add("@DepartmentName", SqlDbType.Date, 0, "DepartmentName");
+                        command.Parameters["DepartmentName"].Value = department.DepartmentName;
                         command.CommandText = sqlAdd;
                         command.Connection = dbConnection;
                         command.ExecuteNonQuery();
