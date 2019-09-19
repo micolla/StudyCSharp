@@ -1,0 +1,77 @@
+﻿<Window x:Class="MailSender.WPFMailSender"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MailSender"
+        mc:Ignorable="d"
+        Title="WpfMailSender " Height="450" Width="800" MinHeight="450" MinWidth="800">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Создать"/>
+                <MenuItem Header="Открыть"/>
+                <MenuItem Header="Сохранить"/>
+                <Separator/>
+                <MenuItem Header="Выход" Click="ExitMenuItem_OnClick"/>
+            </MenuItem>
+            <MenuItem Header="Сервис">
+                <MenuItem Header="Параметры" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem Header="Помощь">
+                <MenuItem Header="О программе" IsEnabled="False"/>
+            </MenuItem>
+        </Menu>
+        <TabControl>
+            <TabItem Header="Формирование рассылки">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                        <RowDefinition Height="10*" MinHeight="30"/>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                        <RowDefinition Height="3*" MinHeight="30"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Email Отправителя"/>
+                    <TextBox Grid.Row="0" Grid.Column="2" Name="UserNameEditor"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Пароль отправителя"/>
+                    <PasswordBox Grid.Row="1" Grid.Column="2" Name="PasswordEditor"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="SMTP сервер"/>
+                    <TextBox Grid.Row="2" Grid.Column="2" Name="SMTPServerEditor" Text="smtp.yandex.ru"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Порт"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" Name="ServerPortEditor" Text="25"/>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+                        <TextBox Name="SubjectEditor" Text="Введите вашу тему письма"/>
+                        <TextBox Name="MessageEditor" Text="Введите ваш текст письма" 
+                                 VerticalAlignment="Stretch" AcceptsReturn="True"
+                                 TextWrapping="WrapWithOverflow" MinLines="5"/>
+                    </StackPanel>
+                    
+                    <Button 
+                        Grid.Row="5" Grid.Column="1"
+                        Content="Отправить письмо"
+                        Name="SendMailButton"
+                        Click="SendMailButton_Click"
+                        />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Планировщик" IsEnabled="False">
+
+            </TabItem>
+            <TabItem Header="Редактор писем"  IsEnabled="False">
+
+            </TabItem>
+            <TabItem Header="Статистика"  IsEnabled="False">
+
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
