@@ -14,7 +14,7 @@ namespace MailSender.Lib
         string message;
         string subject;
         public MailSenderService(string userName,SecureString password, string message,string subject)
-        { 
+        {
             this.host = SenderConfig.host;
             this.port= SenderConfig.port;
             this.user_name = userName;
