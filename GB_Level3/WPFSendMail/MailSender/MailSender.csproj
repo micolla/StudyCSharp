@@ -59,6 +59,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WPFInformationMessage.xaml.cs">
+      <DependentUpon>WPFInformationMessage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WPFMailSender.xaml.cs">
       <DependentUpon>WPFMailSender.xaml</DependentUpon>
     </Compile>
@@ -90,6 +93,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="WPFInformationMessage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WPFMailSender.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -33,12 +33,8 @@ namespace MailSender
 
         private static void ShowState(SentState sentState)
         {
-            if (sentState.IsOk)
-                MessageBox.Show(sentState.Message,
-                        "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
-            else
-                MessageBox.Show(sentState.Message,
-                        "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+            WPFInformationMessage w = new WPFInformationMessage(sentState.IsOk ? "Успех!" : "Ошибка!", sentState.Message);
+            w.ShowDialog();
         }
 
         /// <summary>
