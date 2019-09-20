@@ -23,7 +23,7 @@ namespace MailSender
         {
             InitializeComponent();
             this.Title = title;
-            this.InfoMessageBox.Text = message;
+            this.InfoMessageBox.Content = message;
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
