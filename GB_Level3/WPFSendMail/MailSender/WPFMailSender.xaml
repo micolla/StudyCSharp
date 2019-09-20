@@ -40,21 +40,14 @@
                         <RowDefinition Height="3*" MinHeight="30"/>
                         <RowDefinition Height="3*" MinHeight="30"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Email Отправителя"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Пользователь"/>
                     <TextBox Grid.Row="0" Grid.Column="2" Name="UserNameEditor"/>
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Пароль отправителя"/>
                     <PasswordBox Grid.Row="1" Grid.Column="2" Name="PasswordEditor"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="SMTP сервер"/>
-                    <TextBox Grid.Row="2" Grid.Column="2" Name="SMTPServerEditor" Text="smtp.yandex.ru"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Порт"/>
-                    <TextBox Grid.Row="3" Grid.Column="2" Name="ServerPortEditor" Text="25"/>
-                    <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
-                        <TextBox Name="SubjectEditor" Text="Введите вашу тему письма"/>
-                        <TextBox Name="MessageEditor" Text="Введите ваш текст письма" 
-                                 VerticalAlignment="Stretch" AcceptsReturn="True"
-                                 TextWrapping="WrapWithOverflow" MinLines="5"/>
-                    </StackPanel>
-                    
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Тема письма"/>
+                    <TextBox Grid.Row="2" Grid.Column="2" Name="SubjectEditor" Text="Введите вашу тему письма"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Текст письма"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" Name="MessageEditor" Text="Введите ваш текст письма"/>
                     <Button 
                         Grid.Row="5" Grid.Column="1"
                         Content="Отправить письмо"

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
-using System.Net.Mail;
-using System.Net;
+using MailSender.Lib;
 
 namespace MailSender
 {
@@ -24,45 +23,28 @@ namespace MailSender
         {
             if (IsAllFieldsFilled())
             {
-                var host = SMTPServerEditor.Text;
-                int port;
-                if (!int.TryParse(ServerPortEditor.Text, out port))
-                    MessageBox.Show("Введите цифровое значение в поле Порт", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                MailSenderService mailSenderService
+                    = new MailSenderService(UserNameEditor.Text, PasswordEditor.SecurePassword, MessageEditor.Text, SubjectEditor.Text);
 
-                var user_name = UserNameEditor.Text;
-                var password = PasswordEditor.SecurePassword;
-
-                var msg = MessageEditor.Text;
-
-                using (var client = new SmtpClient(host, port))
-                {
-                    client.EnableSsl = true;
-                    client.Credentials = new NetworkCredential(user_name, password);
-
-                    using (var message = new MailMessage())
-                    {
-                        message.From = new MailAddress(UserNameEditor.Text+"@yandex.ru");
-                        message.To.Add(new MailAddress("micola8903@mail.ru"));
-                        message.Subject = SubjectEditor.Text;
-                        message.Body = msg;
-                        //message.Attachments.Add(new Attachment());
-
-                        try
-                        {
-                            client.Send(message);
-                            MessageBox.Show("Почта успешно отправлена",
-                                "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        catch (Exception error)
-                        {
-                            MessageBox.Show(error.Message,
-                                "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
+                SentState sentState = mailSenderService.SendMail();
+                ShowState(sentState);
             }
         }
 
+        private static void ShowState(SentState sentState)
+        {
+            if (sentState.IsOk)
+                MessageBox.Show(sentState.Message,
+                        "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show(sentState.Message,
+                        "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        /// <summary>
+        /// Заглушка для проверки полей на заполнение
+        /// </summary>
+        /// <returns></returns>
         private bool IsAllFieldsFilled()
         {
             return true;

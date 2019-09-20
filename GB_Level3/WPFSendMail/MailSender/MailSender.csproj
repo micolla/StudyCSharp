@@ -95,5 +95,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MailSender.Lib\MailSender.Lib.csproj">
+      <Project>{81657f77-d7c4-45ad-9a79-86d77f502622}</Project>
+      <Name>MailSender.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
